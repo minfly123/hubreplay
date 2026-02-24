@@ -80,3 +80,8 @@
     background-clip: text;
   }
 }
+
+#lovable-badge,
+.lovable-badge-container {
+    display: none !important;
+      }
