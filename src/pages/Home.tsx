@@ -127,10 +127,18 @@ const Home = () => {
           </div>
           <div className="flex items-center gap-3">
             {isAdmin && (
-              <span className="flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                <Shield className="w-3 h-3" />
-                Admin
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
+                  <Shield className="w-3 h-3" />
+                  Admin
+                </span>
+                <Button variant="outline" size="sm" onClick={() => navigate("/people")} className="text-xs">
+                  Pengguna
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => navigate("/membership/admin")} className="text-xs">
+                  Membership
+                </Button>
+              </div>
             )}
             <Button
               variant="ghost"
