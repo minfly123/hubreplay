@@ -38,12 +38,16 @@ const ReplayCard = ({ replay, isUnlocked, onWatch }: ReplayCardProps) => {
             </div>
           )}
         </div>
-        {!isUnlocked && (
+        {replay.is_free ? (
+          <div className="absolute top-3 right-3 bg-primary/90 backdrop-blur-sm rounded-full px-3 py-1">
+            <span className="text-xs text-primary-foreground font-medium">Gratis</span>
+          </div>
+        ) : !isUnlocked ? (
           <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
             <Lock className="w-3 h-3 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">Terkunci</span>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Info */}

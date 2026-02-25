@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ReplayCard from "@/components/ReplayCard";
 import AccessKeyDialog from "@/components/AccessKeyDialog";
 import AdminReplayForm from "@/components/AdminReplayForm";
+import WelcomeDialog, { hasSeenWelcome } from "@/components/WelcomeDialog";
 import { Button } from "@/components/ui/button";
 import { Play, LogOut, Shield, Plus, Trash2, Pencil, Key } from "lucide-react";
 import { toast } from "sonner";
@@ -42,6 +43,11 @@ const Home = () => {
   const [showMasterDialog, setShowMasterDialog] = useState(false);
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [editReplay, setEditReplay] = useState<Replay | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (!hasSeenWelcome()) setShowWelcome(true);
+  }, []);
 
   useEffect(() => {
     supabase
@@ -54,8 +60,12 @@ const Home = () => {
       });
   }, []);
 
+  const isReplayUnlocked = (replay: Replay) => {
+    return isAdmin || masterUnlocked || replay.is_free || unlockedIds.has(replay.id);
+  };
+
   const handleWatch = (replay: Replay) => {
-    if (isAdmin || masterUnlocked || unlockedIds.has(replay.id)) {
+    if (isReplayUnlocked(replay)) {
       navigate(`/watch/${replay.id}`);
     } else {
       setSelectedReplay(replay);
@@ -96,7 +106,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -141,7 +150,6 @@ const Home = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Admin Controls */}
         {isAdmin && (
           <div className="mb-8">
             {showAdminForm || editReplay ? (
@@ -164,7 +172,6 @@ const Home = () => {
           </div>
         )}
 
-        {/* Replay Grid */}
         <div className="mb-6">
           <h2 className="text-2xl font-display font-bold text-foreground mb-1">
             Arsip Theater
@@ -190,25 +197,19 @@ const Home = () => {
               <div key={replay.id} className="relative">
                 <ReplayCard
                   replay={replay}
-                  isUnlocked={isAdmin || masterUnlocked || unlockedIds.has(replay.id)}
+                  isUnlocked={isReplayUnlocked(replay)}
                   onWatch={handleWatch}
                 />
                 {isAdmin && (
                   <div className="absolute top-3 left-3 flex gap-1 z-10">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditReplay(replay);
-                      }}
+                      onClick={(e) => { e.stopPropagation(); setEditReplay(replay); }}
                       className="w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-primary/20 transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5 text-foreground" />
                     </button>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(replay.id);
-                      }}
+                      onClick={(e) => { e.stopPropagation(); handleDelete(replay.id); }}
                       className="w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-destructive/20 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5 text-destructive" />
@@ -227,13 +228,16 @@ const Home = () => {
         onUnlock={handleUnlock}
         title={selectedReplay?.title ?? ""}
       />
-
       <AccessKeyDialog
         open={showMasterDialog}
         onClose={() => setShowMasterDialog(false)}
         onUnlock={handleMasterUnlock}
         title=""
         isMasterKey
+      />
+      <WelcomeDialog
+        open={showWelcome}
+        onClose={() => setShowWelcome(false)}
       />
     </div>
   );

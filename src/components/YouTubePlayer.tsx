@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings } from "lucide-react";
+import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
@@ -22,19 +22,18 @@ const getYoutubeId = (url: string): string => {
 };
 
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-const QUALITY_ORDER = ["highres", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
-const QUALITIES: Record<string, string> = {
-  highres: "4320p (8K)",
-  hd2160: "2160p (4K)",
-  hd1440: "1440p",
-  hd1080: "1080p",
-  hd720: "720p",
-  large: "480p",
-  medium: "360p",
-  small: "240p",
-  tiny: "144p",
-  auto: "Auto",
-};
+
+const ALL_QUALITIES = [
+  { key: "highres", label: "4320p (8K)" },
+  { key: "hd2160", label: "2160p (4K)" },
+  { key: "hd1440", label: "1440p" },
+  { key: "hd1080", label: "1080p (FHD)" },
+  { key: "hd720", label: "720p (HD)" },
+  { key: "large", label: "480p" },
+  { key: "medium", label: "360p" },
+  { key: "small", label: "240p" },
+  { key: "tiny", label: "144p" },
+];
 
 declare global {
   interface Window {
@@ -56,11 +55,18 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
   const [muted, setMuted] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [quality, setQuality] = useState("auto");
-  const [availableQualities, setAvailableQualities] = useState<string[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [ready, setReady] = useState(false);
   const hideTimeoutRef = useRef<number | null>(null);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const wasPlayingBeforeSeek = useRef(false);
+
+  // Long-press 2x speed
+  const [longPressActive, setLongPressActive] = useState(false);
+  const longPressTimer = useRef<number | null>(null);
+  const longPressSide = useRef<"left" | "right" | null>(null);
+  const originalSpeed = useRef(1);
 
   const loadYTAPI = useCallback(() => {
     if (window.YT && window.YT.Player) return Promise.resolve();
@@ -111,8 +117,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
           onReady: (e: any) => {
             setDuration(e.target.getDuration());
             setReady(true);
-            const q = e.target.getAvailableQualityLevels();
-            setAvailableQualities(q.length ? q : ["auto"]);
           },
           onStateChange: (e: any) => {
             setPlaying(e.data === window.YT.PlayerState.PLAYING);
@@ -157,7 +161,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     startHideTimer();
   }, [startHideTimer]);
 
-  // When playing state changes, manage timer
   useEffect(() => {
     if (playing) {
       startHideTimer();
@@ -173,10 +176,26 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     else playerRef.current.playVideo();
   };
 
-  const seek = (val: number[]) => {
+  // Seek without pausing - just seekTo, video continues
+  const handleSeekStart = () => {
+    setIsSeeking(true);
+    wasPlayingBeforeSeek.current = playing;
+  };
+
+  const handleSeekChange = (val: number[]) => {
+    if (!playerRef.current) return;
+    setCurrentTime(val[0]);
+  };
+
+  const handleSeekCommit = (val: number[]) => {
     if (!playerRef.current) return;
     playerRef.current.seekTo(val[0], true);
     setCurrentTime(val[0]);
+    setIsSeeking(false);
+    // Don't pause - just seek and let it continue/resume
+    if (wasPlayingBeforeSeek.current) {
+      playerRef.current.playVideo();
+    }
   };
 
   const changeVolume = (val: number[]) => {
@@ -208,7 +227,7 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
   const changeQuality = (q: string) => {
     if (!playerRef.current) return;
     if (q === "auto") {
-      playerRef.current.setPlaybackQualityRange?.("small", "hd1080");
+      playerRef.current.setPlaybackQualityRange?.("small", "highres");
     } else {
       playerRef.current.setPlaybackQuality(q);
     }
@@ -220,16 +239,11 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen();
       setIsFullscreen(true);
-      // Force landscape orientation on mobile
-      try {
-        (screen.orientation as any)?.lock?.("landscape");
-      } catch {}
+      try { (screen.orientation as any)?.lock?.("landscape"); } catch {}
     } else {
       document.exitFullscreen();
       setIsFullscreen(false);
-      try {
-        screen.orientation?.unlock?.();
-      } catch {}
+      try { screen.orientation?.unlock?.(); } catch {}
     }
   };
 
@@ -250,23 +264,77 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
 
   // Click on video area: only show/hide controls, never toggle play
   const handleOverlayClick = (e: React.MouseEvent) => {
-    // Don't do anything if clicking on controls area
     if ((e.target as HTMLElement).closest(".player-controls")) return;
     if ((e.target as HTMLElement).closest(".center-play-btn")) return;
+    if (longPressActive) return;
 
     if (!showControls) {
-      // Show controls
       revealControls();
     } else {
-      // Hide controls
       setShowControls(false);
     }
   };
 
-  // Sort qualities from best to worst
-  const sortedQualities = availableQualities
-    .filter((q) => q !== "auto" && QUALITIES[q])
-    .sort((a, b) => QUALITY_ORDER.indexOf(a) - QUALITY_ORDER.indexOf(b));
+  // Long press handlers for 2x speed
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const side = x < rect.width / 2 ? "left" : "right";
+    longPressSide.current = side;
+
+    longPressTimer.current = window.setTimeout(() => {
+      if (!playerRef.current) return;
+      originalSpeed.current = speed;
+      playerRef.current.setPlaybackRate(2);
+      setSpeed(2);
+      setLongPressActive(true);
+    }, 500);
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    if (longPressActive) {
+      playerRef.current?.setPlaybackRate(originalSpeed.current);
+      setSpeed(originalSpeed.current);
+      setLongPressActive(false);
+    }
+  };
+
+  // Mouse long press for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest(".player-controls")) return;
+    if ((e.target as HTMLElement).closest(".center-play-btn")) return;
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = e.clientX - rect.left;
+    longPressSide.current = x < rect.width / 2 ? "left" : "right";
+
+    longPressTimer.current = window.setTimeout(() => {
+      if (!playerRef.current) return;
+      originalSpeed.current = speed;
+      playerRef.current.setPlaybackRate(2);
+      setSpeed(2);
+      setLongPressActive(true);
+    }, 500);
+  };
+
+  const handleMouseUp = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    if (longPressActive) {
+      playerRef.current?.setPlaybackRate(originalSpeed.current);
+      setSpeed(originalSpeed.current);
+      setLongPressActive(false);
+    }
+  };
 
   if (!videoId) return <div className="text-muted-foreground p-4">Invalid URL</div>;
 
@@ -277,14 +345,26 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
       onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
       onClick={handleOverlayClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
       {/* YouTube iframe wrapper */}
       <div className="yt-wrapper absolute inset-0 w-full h-full pointer-events-none" />
 
-      {/* Clickable overlay to capture clicks away from YT */}
+      {/* Clickable overlay */}
       <div className="absolute inset-0 z-10" />
 
-      {/* Center play/pause button - visible when controls are shown */}
+      {/* Long press 2x indicator */}
+      {longPressActive && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm rounded-full px-4 py-1.5 flex items-center gap-2">
+          <FastForward className="w-4 h-4 text-white" />
+          <span className="text-white text-sm font-medium">2x Speed</span>
+        </div>
+      )}
+
+      {/* Center play/pause button */}
       {ready && showControls && (
         <div className="center-play-btn absolute inset-0 z-20 flex items-center justify-center">
           <button
@@ -304,7 +384,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         </div>
       )}
 
-      {/* Center play button when paused and controls hidden */}
       {ready && !playing && !showControls && (
         <div className="center-play-btn absolute inset-0 z-20 flex items-center justify-center">
           <button
@@ -326,6 +405,8 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         }`}
         style={{ background: "linear-gradient(transparent, rgba(0,0,0,0.85))" }}
         onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
       >
         {/* Progress bar */}
         <div className="px-3 pt-2">
@@ -333,40 +414,35 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
             min={0}
             max={duration || 1}
             step={0.5}
-            value={[currentTime]}
-            onValueChange={seek}
+            value={[isSeeking ? currentTime : currentTime]}
+            onPointerDown={handleSeekStart}
+            onValueChange={handleSeekChange}
+            onValueCommit={handleSeekCommit}
             className="w-full [&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:border-primary [&_.bg-primary]:bg-primary"
           />
         </div>
 
         <div className="flex items-center justify-between px-3 py-2 gap-2">
-          {/* Left controls */}
           <div className="flex items-center gap-2">
             <button onClick={togglePlay} className="text-white hover:text-primary transition-colors">
               {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
             </button>
-
             <button onClick={toggleMute} className="text-white hover:text-primary transition-colors">
               {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </button>
-
             <div className="w-20 hidden sm:block">
               <Slider
-                min={0}
-                max={100}
-                step={1}
+                min={0} max={100} step={1}
                 value={[muted ? 0 : volume]}
                 onValueChange={changeVolume}
                 className="[&_[role=slider]]:h-3 [&_[role=slider]]:w-3"
               />
             </div>
-
             <span className="text-white/80 text-xs font-mono ml-1">
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
 
-          {/* Right controls */}
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -392,7 +468,7 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
-                    Kualitas ({QUALITIES[quality] || quality})
+                    Kualitas ({quality === "auto" ? "Auto" : ALL_QUALITIES.find(q => q.key === quality)?.label || quality})
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     <DropdownMenuItem
@@ -402,13 +478,13 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
                       Auto
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {sortedQualities.map((q) => (
+                    {ALL_QUALITIES.map((q) => (
                       <DropdownMenuItem
-                        key={q}
-                        onClick={() => changeQuality(q)}
-                        className={quality === q ? "bg-accent" : ""}
+                        key={q.key}
+                        onClick={() => changeQuality(q.key)}
+                        className={quality === q.key ? "bg-accent" : ""}
                       >
-                        {QUALITIES[q]}
+                        {q.label}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuSubContent>

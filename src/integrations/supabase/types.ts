@@ -58,6 +58,7 @@ export type Database = {
           access_key: string
           created_at: string
           id: string
+          is_free: boolean
           show_time: string
           title: string
           type: string
@@ -68,6 +69,7 @@ export type Database = {
           access_key: string
           created_at?: string
           id?: string
+          is_free?: boolean
           show_time?: string
           title: string
           type?: string
@@ -78,6 +80,7 @@ export type Database = {
           access_key?: string
           created_at?: string
           id?: string
+          is_free?: boolean
           show_time?: string
           title?: string
           type?: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.replays ADD COLUMN is_free BOOLEAN NOT NULL DEFAULT false;
