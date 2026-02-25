@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Subtitles } from "lucide-react";
+import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
@@ -46,7 +46,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
   const [muted, setMuted] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [quality, setQuality] = useState("auto");
-  const [captionsOn, setCaptionsOn] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [ready, setReady] = useState(false);
@@ -437,22 +436,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                if (!playerRef.current) return;
-                if (captionsOn) {
-                  playerRef.current.unloadModule?.("captions");
-                  setCaptionsOn(false);
-                } else {
-                  playerRef.current.loadModule?.("captions");
-                  setCaptionsOn(true);
-                }
-              }}
-              className={`transition-colors ${captionsOn ? "text-primary" : "text-white hover:text-primary"}`}
-              title="Caption/Subtitle"
-            >
-              <Subtitles className="w-5 h-5" />
-            </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="text-white hover:text-primary transition-colors">
