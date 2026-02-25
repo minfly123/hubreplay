@@ -10,13 +10,32 @@ import { Button } from "@/components/ui/button";
 import { Play, LogOut, Shield, Plus, Trash2, Pencil, Key } from "lucide-react";
 import { toast } from "sonner";
 
+const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
+const MASTER_UNLOCKED_KEY = "hub_replay_master_unlocked";
+
+const getUnlockedIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_STORAGE_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch { return new Set(); }
+};
+
+const saveUnlockedId = (id: string) => {
+  const ids = getUnlockedIds();
+  ids.add(id);
+  localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
+};
+
+const isMasterUnlockedStorage = () => localStorage.getItem(MASTER_UNLOCKED_KEY) === "true";
+const setMasterUnlockedStorage = () => localStorage.setItem(MASTER_UNLOCKED_KEY, "true");
+
 const Home = () => {
   const { user, isAdmin, signOut } = useAuth();
   const { replays, loading } = useReplays();
   const navigate = useNavigate();
 
-  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
-  const [masterUnlocked, setMasterUnlocked] = useState(false);
+  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(getUnlockedIds());
+  const [masterUnlocked, setMasterUnlocked] = useState(isMasterUnlockedStorage());
   const [masterKey, setMasterKey] = useState("");
   const [selectedReplay, setSelectedReplay] = useState<Replay | null>(null);
   const [showAccessDialog, setShowAccessDialog] = useState(false);
@@ -47,12 +66,13 @@ const Home = () => {
   const handleUnlock = (key: string): boolean => {
     if (!selectedReplay) return false;
     if (key === selectedReplay.access_key) {
+      saveUnlockedId(selectedReplay.id);
       setUnlockedIds((prev) => new Set([...prev, selectedReplay.id]));
       return true;
     }
-    // Also check master key
     if (key === masterKey) {
       setMasterUnlocked(true);
+      setMasterUnlockedStorage();
       return true;
     }
     return false;
@@ -61,6 +81,7 @@ const Home = () => {
   const handleMasterUnlock = (key: string): boolean => {
     if (key === masterKey) {
       setMasterUnlocked(true);
+      setMasterUnlockedStorage();
       return true;
     }
     return false;
@@ -200,7 +221,6 @@ const Home = () => {
         )}
       </main>
 
-      {/* Access Key Dialog */}
       <AccessKeyDialog
         open={showAccessDialog}
         onClose={() => setShowAccessDialog(false)}
@@ -208,7 +228,6 @@ const Home = () => {
         title={selectedReplay?.title ?? ""}
       />
 
-      {/* Master Key Dialog */}
       <AccessKeyDialog
         open={showMasterDialog}
         onClose={() => setShowMasterDialog(false)}

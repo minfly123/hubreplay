@@ -5,7 +5,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -23,7 +22,11 @@ const getYoutubeId = (url: string): string => {
 };
 
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+const QUALITY_ORDER = ["highres", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
 const QUALITIES: Record<string, string> = {
+  highres: "4320p (8K)",
+  hd2160: "2160p (4K)",
+  hd1440: "1440p",
   hd1080: "1080p",
   hd720: "720p",
   large: "480p",
@@ -141,14 +144,28 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [playing]);
 
-  // Auto-hide controls
-  const resetHideTimer = useCallback(() => {
-    setShowControls(true);
+  // Auto-hide controls after 5 seconds
+  const startHideTimer = useCallback(() => {
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     hideTimeoutRef.current = window.setTimeout(() => {
       if (playing) setShowControls(false);
-    }, 3000);
+    }, 5000);
   }, [playing]);
+
+  const revealControls = useCallback(() => {
+    setShowControls(true);
+    startHideTimer();
+  }, [startHideTimer]);
+
+  // When playing state changes, manage timer
+  useEffect(() => {
+    if (playing) {
+      startHideTimer();
+    } else {
+      setShowControls(true);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    }
+  }, [playing, startHideTimer]);
 
   const togglePlay = () => {
     if (!playerRef.current) return;
@@ -203,9 +220,16 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen();
       setIsFullscreen(true);
+      // Force landscape orientation on mobile
+      try {
+        (screen.orientation as any)?.lock?.("landscape");
+      } catch {}
     } else {
       document.exitFullscreen();
       setIsFullscreen(false);
+      try {
+        screen.orientation?.unlock?.();
+      } catch {}
     }
   };
 
@@ -224,19 +248,35 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
       : `${m}:${sec.toString().padStart(2, "0")}`;
   };
 
+  // Click on video area: only show/hide controls, never toggle play
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    // Don't do anything if clicking on controls area
+    if ((e.target as HTMLElement).closest(".player-controls")) return;
+    if ((e.target as HTMLElement).closest(".center-play-btn")) return;
+
+    if (!showControls) {
+      // Show controls
+      revealControls();
+    } else {
+      // Hide controls
+      setShowControls(false);
+    }
+  };
+
+  // Sort qualities from best to worst
+  const sortedQualities = availableQualities
+    .filter((q) => q !== "auto" && QUALITIES[q])
+    .sort((a, b) => QUALITY_ORDER.indexOf(a) - QUALITY_ORDER.indexOf(b));
+
   if (!videoId) return <div className="text-muted-foreground p-4">Invalid URL</div>;
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video rounded-lg overflow-hidden bg-black group select-none"
-      onMouseMove={resetHideTimer}
+      className="relative w-full aspect-video rounded-lg overflow-hidden bg-black select-none"
+      onMouseMove={revealControls}
       onMouseLeave={() => playing && setShowControls(false)}
-      onClick={(e) => {
-        // Only toggle play if clicking on the overlay area, not controls
-        if ((e.target as HTMLElement).closest(".player-controls")) return;
-        togglePlay();
-      }}
+      onClick={handleOverlayClick}
     >
       {/* YouTube iframe wrapper */}
       <div className="yt-wrapper absolute inset-0 w-full h-full pointer-events-none" />
@@ -244,21 +284,48 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
       {/* Clickable overlay to capture clicks away from YT */}
       <div className="absolute inset-0 z-10" />
 
-      {/* Play/Pause center icon */}
-      {ready && !playing && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-          <div className="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center backdrop-blur-sm">
+      {/* Center play/pause button - visible when controls are shown */}
+      {ready && showControls && (
+        <div className="center-play-btn absolute inset-0 z-20 flex items-center justify-center">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              togglePlay();
+              revealControls();
+            }}
+            className="w-16 h-16 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm hover:bg-black/70 transition-colors"
+          >
+            {playing ? (
+              <Pause className="w-8 h-8 text-white" />
+            ) : (
+              <Play className="w-8 h-8 text-white ml-1" />
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Center play button when paused and controls hidden */}
+      {ready && !playing && !showControls && (
+        <div className="center-play-btn absolute inset-0 z-20 flex items-center justify-center">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              revealControls();
+            }}
+            className="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center backdrop-blur-sm"
+          >
             <Play className="w-8 h-8 text-primary-foreground ml-1" />
-          </div>
+          </button>
         </div>
       )}
 
       {/* Bottom controls */}
       <div
         className={`player-controls absolute bottom-0 left-0 right-0 z-30 transition-opacity duration-300 ${
-          showControls || !playing ? "opacity-100" : "opacity-0 pointer-events-none"
+          showControls ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         style={{ background: "linear-gradient(transparent, rgba(0,0,0,0.85))" }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Progress bar */}
         <div className="px-3 pt-2">
@@ -334,17 +401,16 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
                     >
                       Auto
                     </DropdownMenuItem>
-                    {availableQualities
-                      .filter((q) => q !== "auto" && QUALITIES[q])
-                      .map((q) => (
-                        <DropdownMenuItem
-                          key={q}
-                          onClick={() => changeQuality(q)}
-                          className={quality === q ? "bg-accent" : ""}
-                        >
-                          {QUALITIES[q]}
-                        </DropdownMenuItem>
-                      ))}
+                    <DropdownMenuSeparator />
+                    {sortedQualities.map((q) => (
+                      <DropdownMenuItem
+                        key={q}
+                        onClick={() => changeQuality(q)}
+                        className={quality === q ? "bg-accent" : ""}
+                      >
+                        {QUALITIES[q]}
+                      </DropdownMenuItem>
+                    ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
               </DropdownMenuContent>
