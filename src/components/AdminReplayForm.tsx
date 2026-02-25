@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import type { Replay } from "@/hooks/useReplays";
 
@@ -16,6 +18,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
   const [type, setType] = useState("Theater");
   const [showTime, setShowTime] = useState("");
   const [accessKey, setAccessKey] = useState("");
+  const [isFree, setIsFree] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -25,6 +28,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       setType(editReplay.type);
       setShowTime(editReplay.show_time.slice(0, 16));
       setAccessKey(editReplay.access_key);
+      setIsFree((editReplay as any).is_free ?? false);
     }
   }, [editReplay]);
 
@@ -37,7 +41,8 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       youtube_url: youtubeUrl.trim(),
       type: type.trim(),
       show_time: new Date(showTime).toISOString(),
-      access_key: accessKey.trim(),
+      access_key: isFree ? "FREE" : accessKey.trim(),
+      is_free: isFree,
     };
 
     if (editReplay) {
@@ -60,6 +65,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
     setType("Theater");
     setShowTime("");
     setAccessKey("");
+    setIsFree(false);
   };
 
   return (
@@ -95,13 +101,25 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
         className="bg-secondary border-border"
         required
       />
-      <Input
-        placeholder="Kunci Akses"
-        value={accessKey}
-        onChange={(e) => setAccessKey(e.target.value)}
-        className="bg-secondary border-border"
-        required
-      />
+
+      {/* Free/Paid toggle */}
+      <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border">
+        <Switch id="is-free" checked={isFree} onCheckedChange={setIsFree} />
+        <Label htmlFor="is-free" className="text-foreground font-medium cursor-pointer">
+          {isFree ? "Show Gratis (Tanpa Kunci)" : "Show Berbayar (Perlu Kunci Akses)"}
+        </Label>
+      </div>
+
+      {!isFree && (
+        <Input
+          placeholder="Kunci Akses"
+          value={accessKey}
+          onChange={(e) => setAccessKey(e.target.value)}
+          className="bg-secondary border-border"
+          required={!isFree}
+        />
+      )}
+
       <div className="flex gap-3">
         <Button
           type="submit"
