@@ -2,18 +2,19 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useReplays, Replay } from "@/hooks/useReplays";
-import { supabase } from "@/integrations/supabase/client";
+import { useMembership } from "@/hooks/useMembership";
 import ReplayCard from "@/components/ReplayCard";
 import AccessKeyDialog from "@/components/AccessKeyDialog";
 import AdminReplayForm from "@/components/AdminReplayForm";
 import WelcomeDialog, { hasSeenWelcome } from "@/components/WelcomeDialog";
+import MembershipCountdown from "@/components/MembershipCountdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Play, LogOut, Shield, Plus, Trash2, Pencil, Key, HelpCircle, Search } from "lucide-react";
+import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
-const MASTER_UNLOCKED_KEY = "hub_replay_master_unlocked";
 
 const getUnlockedIds = (): Set<string> => {
   try {
@@ -28,58 +29,62 @@ const saveUnlockedId = (id: string) => {
   localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
 };
 
-const isMasterUnlockedStorage = () => localStorage.getItem(MASTER_UNLOCKED_KEY) === "true";
-const setMasterUnlockedStorage = () => localStorage.setItem(MASTER_UNLOCKED_KEY, "true");
+// Time filter options
+const TIME_FILTERS = [
+  { key: "all", label: "Semua" },
+  { key: "today", label: "Hari Ini" },
+  { key: "week", label: "Minggu Ini" },
+  { key: "month", label: "Bulan Ini" },
+  { key: "year", label: "Tahun Ini" },
+];
 
 const Home = () => {
   const { user, isAdmin, signOut } = useAuth();
   const { replays, loading } = useReplays();
+  const { membership, isActive: hasMembership } = useMembership();
   const navigate = useNavigate();
 
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(getUnlockedIds());
-  const [masterUnlocked, setMasterUnlocked] = useState(isMasterUnlockedStorage());
-  const [masterKey, setMasterKey] = useState("");
   const [selectedReplay, setSelectedReplay] = useState<Replay | null>(null);
   const [showAccessDialog, setShowAccessDialog] = useState(false);
-  const [showMasterDialog, setShowMasterDialog] = useState(false);
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [editReplay, setEditReplay] = useState<Replay | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<string>("all");
+  const [filterTime, setFilterTime] = useState("all");
 
   useEffect(() => {
     if (!hasSeenWelcome()) setShowWelcome(true);
   }, []);
 
-  useEffect(() => {
-    supabase
-      .from("app_settings")
-      .select("value")
-      .eq("key", "master_key")
-      .single()
-      .then(({ data }) => {
-        if (data) setMasterKey(data.value);
-      });
-  }, []);
-
-  // Derive unique types for filter
-  const replayTypes = useMemo(() => {
-    const types = new Set(replays.map((r) => r.type));
-    return ["all", ...Array.from(types)];
-  }, [replays]);
-
-  // Filter and search
+  // Filter by time
   const filteredReplays = useMemo(() => {
+    const now = new Date();
     return replays.filter((r) => {
       const matchesSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = filterType === "all" || r.type === filterType;
-      return matchesSearch && matchesType;
+      if (!matchesSearch) return false;
+
+      if (filterTime === "all") return true;
+      const showDate = new Date(r.show_time);
+      if (filterTime === "today") {
+        return showDate.toDateString() === now.toDateString();
+      }
+      if (filterTime === "week") {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return showDate >= weekAgo;
+      }
+      if (filterTime === "month") {
+        return showDate.getMonth() === now.getMonth() && showDate.getFullYear() === now.getFullYear();
+      }
+      if (filterTime === "year") {
+        return showDate.getFullYear() === now.getFullYear();
+      }
+      return true;
     });
-  }, [replays, searchQuery, filterType]);
+  }, [replays, searchQuery, filterTime]);
 
   const isReplayUnlocked = (replay: Replay) => {
-    return isAdmin || masterUnlocked || replay.is_free || unlockedIds.has(replay.id);
+    return isAdmin || hasMembership || replay.is_free || unlockedIds.has(replay.id);
   };
 
   const handleWatch = (replay: Replay) => {
@@ -96,20 +101,6 @@ const Home = () => {
     if (key === selectedReplay.access_key) {
       saveUnlockedId(selectedReplay.id);
       setUnlockedIds((prev) => new Set([...prev, selectedReplay.id]));
-      return true;
-    }
-    if (key === masterKey) {
-      setMasterUnlocked(true);
-      setMasterUnlockedStorage();
-      return true;
-    }
-    return false;
-  };
-
-  const handleMasterUnlock = (key: string): boolean => {
-    if (key === masterKey) {
-      setMasterUnlocked(true);
-      setMasterUnlockedStorage();
       return true;
     }
     return false;
@@ -141,22 +132,6 @@ const Home = () => {
                 Admin
               </span>
             )}
-            {!isAdmin && !masterUnlocked && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowMasterDialog(true)}
-                className="text-xs"
-              >
-                <Key className="w-3 h-3 mr-1" />
-                Master Key
-              </Button>
-            )}
-            {masterUnlocked && !isAdmin && (
-              <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                ✓ All Unlocked
-              </span>
-            )}
             <Button
               variant="ghost"
               size="sm"
@@ -176,6 +151,13 @@ const Home = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Membership countdown */}
+        {membership && !membership.isExpired && (
+          <div className="mb-6">
+            <MembershipCountdown membership={membership} />
+          </div>
+        )}
+
         {isAdmin && (
           <div className="mb-8">
             {showAdminForm || editReplay ? (
@@ -207,7 +189,7 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Search & Filter */}
+        {/* Search & Time Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -219,15 +201,15 @@ const Home = () => {
             />
           </div>
           <div className="flex gap-2 flex-wrap">
-            {replayTypes.map((type) => (
+            {TIME_FILTERS.map((f) => (
               <Button
-                key={type}
-                variant={filterType === type ? "default" : "outline"}
+                key={f.key}
+                variant={filterTime === f.key ? "default" : "outline"}
                 size="sm"
-                onClick={() => setFilterType(type)}
-                className={filterType === type ? "gradient-primary text-primary-foreground" : ""}
+                onClick={() => setFilterTime(f.key)}
+                className={filterTime === f.key ? "gradient-primary text-primary-foreground" : ""}
               >
-                {type === "all" ? "Semua" : type}
+                {f.label}
               </Button>
             ))}
           </div>
@@ -279,13 +261,6 @@ const Home = () => {
         onClose={() => setShowAccessDialog(false)}
         onUnlock={handleUnlock}
         title={selectedReplay?.title ?? ""}
-      />
-      <AccessKeyDialog
-        open={showMasterDialog}
-        onClose={() => setShowMasterDialog(false)}
-        onUnlock={handleMasterUnlock}
-        title=""
-        isMasterKey
       />
       <WelcomeDialog
         open={showWelcome}

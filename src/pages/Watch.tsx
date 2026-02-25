@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useMembership } from "@/hooks/useMembership";
 import YouTubePlayer from "@/components/YouTubePlayer";
 import AccessKeyDialog from "@/components/AccessKeyDialog";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,6 @@ import { id as idLocale } from "date-fns/locale";
 import type { Replay } from "@/hooks/useReplays";
 
 const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
-const MASTER_UNLOCKED_KEY = "hub_replay_master_unlocked";
 
 const getUnlockedIds = (): Set<string> => {
   try {
@@ -26,18 +26,15 @@ const saveUnlockedId = (id: string) => {
   localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
 };
 
-const isMasterUnlocked = () => localStorage.getItem(MASTER_UNLOCKED_KEY) === "true";
-const setMasterUnlockedStorage = () => localStorage.setItem(MASTER_UNLOCKED_KEY, "true");
-
 const Watch = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { isActive: hasMembership } = useMembership();
   const [replay, setReplay] = useState<Replay | null>(null);
   const [loading, setLoading] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [masterKey, setMasterKey] = useState("");
 
   useEffect(() => {
     const fetchReplay = async () => {
@@ -49,39 +46,23 @@ const Watch = () => {
       if (data) setReplay(data);
       setLoading(false);
     };
-
-    supabase
-      .from("app_settings")
-      .select("value")
-      .eq("key", "master_key")
-      .single()
-      .then(({ data }) => {
-        if (data) setMasterKey(data.value);
-      });
-
     fetchReplay();
   }, [id]);
 
-  // Check unlock status (including free shows)
   useEffect(() => {
     if (!replay) return;
-    if (isAdmin || isMasterUnlocked() || replay.is_free || (id && getUnlockedIds().has(id))) {
+    if (isAdmin || hasMembership || replay.is_free || (id && getUnlockedIds().has(id))) {
       setUnlocked(true);
     } else {
       setShowDialog(true);
     }
-  }, [isAdmin, id, replay]);
+  }, [isAdmin, id, replay, hasMembership]);
 
   const handleUnlock = (key: string): boolean => {
     if (!replay) return false;
     if (key === replay.access_key) {
       setUnlocked(true);
       saveUnlockedId(replay.id);
-      return true;
-    }
-    if (key === masterKey) {
-      setUnlocked(true);
-      setMasterUnlockedStorage();
       return true;
     }
     return false;
@@ -99,9 +80,7 @@ const Watch = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Replay tidak ditemukan.</p>
-        <Button variant="outline" onClick={() => navigate("/")}>
-          Kembali
-        </Button>
+        <Button variant="outline" onClick={() => navigate("/")}>Kembali</Button>
       </div>
     );
   }

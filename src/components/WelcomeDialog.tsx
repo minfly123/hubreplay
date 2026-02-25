@@ -6,7 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Key, Lock, MessageCircle, ShieldCheck } from "lucide-react";
+import { Lock, Crown, MessageCircle, ShieldCheck } from "lucide-react";
 
 interface WelcomeDialogProps {
   open: boolean;
@@ -45,19 +45,19 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
             <div>
               <h4 className="font-semibold text-foreground text-sm">Kunci Akses</h4>
               <p className="text-muted-foreground text-sm">
-                Setiap show memiliki kunci akses tersendiri. Masukkan kunci untuk membuka dan menonton replay.
+                Setiap show berbayar memiliki kunci akses tersendiri. Masukkan kunci untuk membuka dan menonton replay.
               </p>
             </div>
           </div>
 
           <div className="flex gap-3 items-start">
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-              <Key className="w-4 h-4 text-primary" />
+              <Crown className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h4 className="font-semibold text-foreground text-sm">Master Key</h4>
+              <h4 className="font-semibold text-foreground text-sm">Membership</h4>
               <p className="text-muted-foreground text-sm">
-                Khusus member! Master Key membuka <strong>semua show</strong> sekaligus tanpa perlu memasukkan kunci satu per satu.
+                Dengan membership, <strong>semua show</strong> terbuka selama masa aktif. Tersedia paket 1 minggu, 1 bulan, atau permanen.
               </p>
             </div>
           </div>
@@ -67,9 +67,9 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
               <MessageCircle className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h4 className="font-semibold text-foreground text-sm">Beli Kunci Akses / Master Key</h4>
+              <h4 className="font-semibold text-foreground text-sm">Beli Kunci Akses / Membership</h4>
               <p className="text-muted-foreground text-sm">
-                Hubungi admin melalui WhatsApp untuk membeli kunci akses atau Master Key:
+                Hubungi admin melalui WhatsApp untuk membeli kunci akses atau membership:
               </p>
               <a
                 href="https://wa.me/62895351456586"
