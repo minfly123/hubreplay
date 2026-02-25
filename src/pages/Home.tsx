@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useReplays, Replay } from "@/hooks/useReplays";
@@ -8,7 +8,8 @@ import AccessKeyDialog from "@/components/AccessKeyDialog";
 import AdminReplayForm from "@/components/AdminReplayForm";
 import WelcomeDialog, { hasSeenWelcome } from "@/components/WelcomeDialog";
 import { Button } from "@/components/ui/button";
-import { Play, LogOut, Shield, Plus, Trash2, Pencil, Key } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Play, LogOut, Shield, Plus, Trash2, Pencil, Key, HelpCircle, Search } from "lucide-react";
 import { toast } from "sonner";
 
 const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
@@ -44,6 +45,8 @@ const Home = () => {
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [editReplay, setEditReplay] = useState<Replay | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
 
   useEffect(() => {
     if (!hasSeenWelcome()) setShowWelcome(true);
@@ -60,12 +63,27 @@ const Home = () => {
       });
   }, []);
 
+  // Derive unique types for filter
+  const replayTypes = useMemo(() => {
+    const types = new Set(replays.map((r) => r.type));
+    return ["all", ...Array.from(types)];
+  }, [replays]);
+
+  // Filter and search
+  const filteredReplays = useMemo(() => {
+    return replays.filter((r) => {
+      const matchesSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = filterType === "all" || r.type === filterType;
+      return matchesSearch && matchesType;
+    });
+  }, [replays, searchQuery, filterType]);
+
   const isReplayUnlocked = (replay: Replay) => {
     return isAdmin || masterUnlocked || replay.is_free || unlockedIds.has(replay.id);
   };
 
   const handleWatch = (replay: Replay) => {
-    if (isReplayUnlocked(replay)) {
+    if (replay.is_free || isReplayUnlocked(replay)) {
       navigate(`/watch/${replay.id}`);
     } else {
       setSelectedReplay(replay);
@@ -139,6 +157,14 @@ const Home = () => {
                 ✓ All Unlocked
               </span>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowWelcome(true)}
+              className="text-muted-foreground"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </Button>
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user?.email}
             </span>
@@ -181,19 +207,45 @@ const Home = () => {
           </p>
         </div>
 
+        {/* Search & Filter */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Cari judul show..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-secondary border-border"
+            />
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {replayTypes.map((type) => (
+              <Button
+                key={type}
+                variant={filterType === type ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilterType(type)}
+                className={filterType === type ? "gradient-primary text-primary-foreground" : ""}
+              >
+                {type === "all" ? "Semua" : type}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="glass-card aspect-video animate-pulse" />
             ))}
           </div>
-        ) : replays.length === 0 ? (
+        ) : filteredReplays.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
-            Belum ada replay tersedia.
+            {replays.length === 0 ? "Belum ada replay tersedia." : "Tidak ada hasil yang cocok."}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {replays.map((replay) => (
+            {filteredReplays.map((replay) => (
               <div key={replay.id} className="relative">
                 <ReplayCard
                   replay={replay}

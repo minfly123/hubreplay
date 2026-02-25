@@ -64,19 +64,13 @@ const Watch = () => {
 
   // Check unlock status (including free shows)
   useEffect(() => {
-    if (isAdmin || isMasterUnlocked() || (id && getUnlockedIds().has(id))) {
+    if (!replay) return;
+    if (isAdmin || isMasterUnlocked() || replay.is_free || (id && getUnlockedIds().has(id))) {
       setUnlocked(true);
-    }
-    if (replay?.is_free) {
-      setUnlocked(true);
-    }
-  }, [isAdmin, id, replay]);
-
-  useEffect(() => {
-    if (replay && !unlocked && !isAdmin) {
+    } else {
       setShowDialog(true);
     }
-  }, [replay, unlocked, isAdmin]);
+  }, [isAdmin, id, replay]);
 
   const handleUnlock = (key: string): boolean => {
     if (!replay) return false;
