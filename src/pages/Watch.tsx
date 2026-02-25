@@ -10,6 +10,25 @@ import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import type { Replay } from "@/hooks/useReplays";
 
+const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
+const MASTER_UNLOCKED_KEY = "hub_replay_master_unlocked";
+
+const getUnlockedIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_STORAGE_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch { return new Set(); }
+};
+
+const saveUnlockedId = (id: string) => {
+  const ids = getUnlockedIds();
+  ids.add(id);
+  localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
+};
+
+const isMasterUnlocked = () => localStorage.getItem(MASTER_UNLOCKED_KEY) === "true";
+const setMasterUnlockedStorage = () => localStorage.setItem(MASTER_UNLOCKED_KEY, "true");
+
 const Watch = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,9 +62,12 @@ const Watch = () => {
     fetchReplay();
   }, [id]);
 
+  // Check unlock status
   useEffect(() => {
-    if (isAdmin) setUnlocked(true);
-  }, [isAdmin]);
+    if (isAdmin || isMasterUnlocked() || (id && getUnlockedIds().has(id))) {
+      setUnlocked(true);
+    }
+  }, [isAdmin, id]);
 
   useEffect(() => {
     if (replay && !unlocked && !isAdmin) {
@@ -55,8 +77,14 @@ const Watch = () => {
 
   const handleUnlock = (key: string): boolean => {
     if (!replay) return false;
-    if (key === replay.access_key || key === masterKey) {
+    if (key === replay.access_key) {
       setUnlocked(true);
+      saveUnlockedId(replay.id);
+      return true;
+    }
+    if (key === masterKey) {
+      setUnlocked(true);
+      setMasterUnlockedStorage();
       return true;
     }
     return false;
@@ -83,7 +111,6 @@ const Watch = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
