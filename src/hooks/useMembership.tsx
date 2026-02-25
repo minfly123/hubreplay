@@ -63,12 +63,12 @@ export const useMembership = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user]);
 
-  // Countdown ticker - re-check every minute
+  // Countdown ticker - re-check every second for realtime expiry
   useEffect(() => {
     if (!membership || membership.isPermanent || membership.isExpired) return;
     const interval = setInterval(() => {
       checkMembership();
-    }, 60000);
+    }, 1000);
     return () => clearInterval(interval);
   }, [membership]);
 

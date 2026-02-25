@@ -7,6 +7,7 @@ import { Play, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const DURATION_LABELS: Record<string, string> = {
+  "10_seconds": "10 Detik (Testing)",
   "1_week": "1 Minggu",
   "1_month": "1 Bulan",
   permanent: "Permanen",
@@ -48,7 +49,9 @@ const MembershipActivate = () => {
 
     const now = new Date();
     let expiresAt: string | null = null;
-    if (membership.duration === "1_week") {
+    if (membership.duration === "10_seconds") {
+      expiresAt = new Date(now.getTime() + 10 * 1000).toISOString();
+    } else if (membership.duration === "1_week") {
       expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
     } else if (membership.duration === "1_month") {
       expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();

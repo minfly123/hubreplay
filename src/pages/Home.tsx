@@ -10,7 +10,13 @@ import WelcomeDialog, { hasSeenWelcome } from "@/components/WelcomeDialog";
 import MembershipCountdown from "@/components/MembershipCountdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search, Menu, Users, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -127,18 +133,24 @@ const Home = () => {
           </div>
           <div className="flex items-center gap-3">
             {isAdmin && (
-              <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                  <Shield className="w-3 h-3" />
-                  Admin
-                </span>
-                <Button variant="outline" size="sm" onClick={() => navigate("/people")} className="text-xs">
-                  Pengguna
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => navigate("/membership/admin")} className="text-xs">
-                  Membership
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Menu className="w-4 h-4" />
+                    <Shield className="w-3 h-3 text-primary" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate("/people")}>
+                    <Users className="w-4 h-4 mr-2" />
+                    Pengguna
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/membership/admin")}>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Membership
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             <Button
               variant="ghost"
