@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Play, Plus, Copy, Check, Clock, User } from "lucide-react";
+import { ArrowLeft, Play, Plus, Copy, Check, Clock, User, Trash2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -26,6 +26,7 @@ interface Membership {
 }
 
 const DURATION_LABELS: Record<string, string> = {
+  "10_seconds": "10 Detik (Testing)",
   "1_week": "1 Minggu",
   "1_month": "1 Bulan",
   permanent: "Permanen",
@@ -44,7 +45,7 @@ const MembershipAdmin = () => {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [duration, setDuration] = useState("1_week");
+  const [duration, setDuration] = useState("10_seconds");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -107,6 +108,16 @@ const MembershipAdmin = () => {
     return "-";
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Hapus membership ini?")) return;
+    const { error } = await supabase.from("memberships").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Membership dihapus!");
+      fetchMemberships();
+    }
+  };
+
   const copyMembershipInfo = (m: Membership) => {
     const url = `${window.location.origin}/membership/${m.token}`;
     const text = `🎫 Membership Hub Replay\n\n📋 ID: ${m.id.slice(0, 8)}\n⏱ Durasi: ${DURATION_LABELS[m.duration]}\n🔗 URL Aktivasi: ${url}\n⏳ Masa Habis: ${getExpiryLabel(m)}\n\n⚠️ Jangan bagikan link ini! Hanya bisa diaktivasi 1 kali untuk 1 akun.`;
@@ -157,6 +168,7 @@ const MembershipAdmin = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="10_seconds">10 Detik (Testing)</SelectItem>
                   <SelectItem value="1_week">1 Minggu</SelectItem>
                   <SelectItem value="1_month">1 Bulan</SelectItem>
                   <SelectItem value="permanent">Permanen</SelectItem>
@@ -190,15 +202,25 @@ const MembershipAdmin = () => {
                     {DURATION_LABELS[m.duration]}
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyMembershipInfo(m)}
-                  className="text-xs"
-                >
-                  {copiedId === m.id ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-                  {copiedId === m.id ? "Tersalin" : "Salin Info"}
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyMembershipInfo(m)}
+                    className="text-xs"
+                  >
+                    {copiedId === m.id ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                    {copiedId === m.id ? "Tersalin" : "Salin Info"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(m.id)}
+                    className="text-xs text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground font-mono break-all">
                 Token: {m.token}
