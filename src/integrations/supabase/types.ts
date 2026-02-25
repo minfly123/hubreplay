@@ -32,6 +32,42 @@ export type Database = {
         }
         Relationships: []
       }
+      memberships: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          created_at: string
+          created_by: string
+          duration: string
+          expires_at: string | null
+          id: string
+          is_used: boolean
+          token: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          created_at?: string
+          created_by: string
+          duration: string
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean
+          token: string
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          created_at?: string
+          created_by?: string
+          duration?: string
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean
+          token?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

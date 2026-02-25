@@ -7,6 +7,9 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Watch from "./pages/Watch";
+import People from "./pages/People";
+import MembershipAdmin from "./pages/MembershipAdmin";
+import MembershipActivate from "./pages/MembershipActivate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +25,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/watch/:id" element={<Watch />} />
+            <Route path="/people" element={<People />} />
+            <Route path="/membership/admin" element={<MembershipAdmin />} />
+            <Route path="/membership/:token" element={<MembershipActivate />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

@@ -23,17 +23,8 @@ const getYoutubeId = (url: string): string => {
 
 const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-const ALL_QUALITIES = [
-  { key: "highres", label: "4320p (8K)" },
-  { key: "hd2160", label: "2160p (4K)" },
-  { key: "hd1440", label: "1440p" },
-  { key: "hd1080", label: "1080p (FHD)" },
-  { key: "hd720", label: "720p (HD)" },
-  { key: "large", label: "480p" },
-  { key: "medium", label: "360p" },
-  { key: "small", label: "240p" },
-  { key: "tiny", label: "144p" },
-];
+// Note: YouTube IFrame API deprecated setPlaybackQuality in 2023.
+// Quality is now auto-managed by YouTube. We keep the UI for user awareness only.
 
 declare global {
   interface Window {
@@ -466,29 +457,9 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    Kualitas ({quality === "auto" ? "Auto" : ALL_QUALITIES.find(q => q.key === quality)?.label || quality})
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem
-                      onClick={() => changeQuality("auto")}
-                      className={quality === "auto" ? "bg-accent" : ""}
-                    >
-                      Auto
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    {ALL_QUALITIES.map((q) => (
-                      <DropdownMenuItem
-                        key={q.key}
-                        onClick={() => changeQuality(q.key)}
-                        className={quality === q.key ? "bg-accent" : ""}
-                      >
-                        {q.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                  Kualitas: Auto (dikelola YouTube)
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
