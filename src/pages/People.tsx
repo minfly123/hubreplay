@@ -3,19 +3,34 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, Play } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, Play, Users, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 
-interface Profile {
+interface ProfileWithRole {
   id: string;
   user_id: string;
   email: string | null;
   created_at: string;
+  role: string;
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  user: "Member",
+  admin: "Admin",
+  super_admin: "Super Admin",
+};
+
 const People = () => {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, isSuperAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [profiles, setProfiles] = useState<ProfileWithRole[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,13 +39,60 @@ const People = () => {
       navigate("/", { replace: true });
       return;
     }
-    const fetchProfiles = async () => {
-      const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-      if (data) setProfiles(data);
-      setLoading(false);
-    };
     fetchProfiles();
+
+    // Realtime for role changes
+    const channel = supabase
+      .channel("people-roles")
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_roles" }, () => fetchProfiles())
+      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => fetchProfiles())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [user, isAdmin, authLoading, navigate]);
+
+  const fetchProfiles = async () => {
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!profilesData) { setLoading(false); return; }
+
+    // Fetch roles
+    const { data: rolesData } = await supabase
+      .from("user_roles")
+      .select("user_id, role");
+
+    const roleMap: Record<string, string> = {};
+    if (rolesData) {
+      rolesData.forEach(r => { roleMap[r.user_id] = r.role; });
+    }
+
+    setProfiles(profilesData.map(p => ({
+      ...p,
+      role: roleMap[p.user_id] || "user",
+    })));
+    setLoading(false);
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    if (!isSuperAdmin) {
+      toast.error("Akses ditolak! Hanya untuk Super Admin.");
+      return;
+    }
+
+    const { error } = await supabase.functions.invoke("manage-role", {
+      body: { target_user_id: userId, new_role: newRole },
+    });
+
+    if (error) {
+      toast.error("Gagal mengubah role.");
+    } else {
+      toast.success("Role berhasil diubah!");
+      fetchProfiles();
+    }
+  };
 
   if (authLoading || loading) {
     return (
@@ -74,15 +136,37 @@ const People = () => {
 
         <div className="space-y-2">
           {profiles.map((p, i) => (
-            <div key={p.id} className="glass-card p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-8">{i + 1}.</span>
-                <div>
-                  <p className="text-foreground text-sm font-medium">{p.email || "No email"}</p>
+            <div key={p.id} className="glass-card p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="text-xs text-muted-foreground w-8 shrink-0">{i + 1}.</span>
+                <div className="min-w-0">
+                  <p className="text-foreground text-sm font-medium truncate">{p.email || "No email"}</p>
                   <p className="text-muted-foreground text-xs">
                     Bergabung: {new Date(p.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                   </p>
                 </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {isSuperAdmin ? (
+                  <Select
+                    value={p.role}
+                    onValueChange={(val) => handleRoleChange(p.user_id, val)}
+                  >
+                    <SelectTrigger className="w-[130px] h-8 text-xs bg-secondary border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Member</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="super_admin">Super Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className="text-xs px-2 py-1 rounded-full bg-secondary text-muted-foreground flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3" />
+                    {ROLE_LABELS[p.role] || "Member"}
+                  </span>
+                )}
               </div>
             </div>
           ))}
