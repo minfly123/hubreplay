@@ -26,7 +26,6 @@ interface Membership {
 }
 
 const DURATION_LABELS: Record<string, string> = {
-  "10_seconds": "10 Detik (Testing)",
   "1_week": "1 Minggu",
   "1_month": "1 Bulan",
   permanent: "Permanen",
@@ -45,7 +44,7 @@ const MembershipAdmin = () => {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [duration, setDuration] = useState("10_seconds");
+  const [duration, setDuration] = useState("1_week");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -109,7 +108,7 @@ const MembershipAdmin = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Hapus membership ini?")) return;
+    if (!confirm("Hapus membership ini? Jika sudah diaktivasi, membership pengguna akan dicabut.")) return;
     const { error } = await supabase.from("memberships").delete().eq("id", id);
     if (error) toast.error(error.message);
     else {
@@ -168,7 +167,6 @@ const MembershipAdmin = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10_seconds">10 Detik (Testing)</SelectItem>
                   <SelectItem value="1_week">1 Minggu</SelectItem>
                   <SelectItem value="1_month">1 Bulan</SelectItem>
                   <SelectItem value="permanent">Permanen</SelectItem>
@@ -195,9 +193,12 @@ const MembershipAdmin = () => {
             <div key={m.id} className="glass-card p-4 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${m.is_used ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"}`}>
-                    {m.is_used ? "Aktif" : "Belum Aktif"}
-                  </span>
+                  {(() => {
+                    if (!m.is_used) return <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">Belum Aktif</span>;
+                    if (m.duration === "permanent") return <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">Aktif (Permanen)</span>;
+                    if (m.expires_at && new Date(m.expires_at).getTime() <= Date.now()) return <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive">Kadaluarsa</span>;
+                    return <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">Aktif</span>;
+                  })()}
                   <span className="text-xs text-muted-foreground">
                     {DURATION_LABELS[m.duration]}
                   </span>

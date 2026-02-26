@@ -184,7 +184,7 @@ const Home = () => {
           </div>
         )}
 
-        {isAdmin && (
+        {isSuperAdmin && (
           <div className="mb-8">
             {showAdminForm || editReplay ? (
               <AdminReplayForm
@@ -255,7 +255,7 @@ const Home = () => {
                   isUnlocked={isReplayUnlocked(replay)}
                   onWatch={handleWatch}
                 />
-                {isAdmin && (
+                {isSuperAdmin && (
                   <div className="absolute top-3 left-3 flex gap-1 z-10">
                     <button
                       onClick={(e) => { e.stopPropagation(); setEditReplay(replay); }}
