@@ -2,10 +2,14 @@ import { useState, useEffect, createContext, useContext, ReactNode } from "react
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+type AppRole = "user" | "admin" | "super_admin";
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  role: AppRole;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -13,7 +17,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
+  role: "user",
   isAdmin: false,
+  isSuperAdmin: false,
   loading: true,
   signOut: async () => {},
 });
@@ -21,51 +27,51 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<AppRole>("user");
   const [loading, setLoading] = useState(true);
 
-  const checkAdmin = async (userId: string) => {
+  const checkRole = async (userId: string) => {
     try {
       const { data } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
-        .eq("role", "admin")
         .maybeSingle();
-      setIsAdmin(!!data);
+      if (data?.role) {
+        setRole(data.role as AppRole);
+      } else {
+        setRole("user");
+      }
     } catch {
-      setIsAdmin(false);
+      setRole("user");
     }
   };
 
   useEffect(() => {
     let mounted = true;
 
-    // Set up listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Use setTimeout to avoid Supabase auth deadlock
           setTimeout(() => {
-            if (mounted) checkAdmin(session.user.id);
+            if (mounted) checkRole(session.user.id);
           }, 0);
         } else {
-          setIsAdmin(false);
+          setRole("user");
         }
         setLoading(false);
       }
     );
 
-    // Then get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdmin(session.user.id);
+        checkRole(session.user.id);
       }
       setLoading(false);
     });
@@ -80,8 +86,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
   };
 
+  const isAdmin = role === "admin" || role === "super_admin";
+  const isSuperAdmin = role === "super_admin";
+
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, isAdmin, isSuperAdmin, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

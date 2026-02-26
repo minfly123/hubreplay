@@ -14,9 +14,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search, Menu, Users, CreditCard } from "lucide-react";
+import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search, Menu, Users, CreditCard, ShieldCheck, Film, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -35,7 +36,6 @@ const saveUnlockedId = (id: string) => {
   localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
 };
 
-// Time filter options
 const TIME_FILTERS = [
   { key: "all", label: "Semua" },
   { key: "today", label: "Hari Ini" },
@@ -45,7 +45,7 @@ const TIME_FILTERS = [
 ];
 
 const Home = () => {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isSuperAdmin, signOut } = useAuth();
   const { replays, loading } = useReplays();
   const { membership, isActive: hasMembership } = useMembership();
   const navigate = useNavigate();
@@ -63,28 +63,17 @@ const Home = () => {
     if (!hasSeenWelcome()) setShowWelcome(true);
   }, []);
 
-  // Filter by time
   const filteredReplays = useMemo(() => {
     const now = new Date();
     return replays.filter((r) => {
       const matchesSearch = r.title.toLowerCase().includes(searchQuery.toLowerCase());
       if (!matchesSearch) return false;
-
       if (filterTime === "all") return true;
       const showDate = new Date(r.show_time);
-      if (filterTime === "today") {
-        return showDate.toDateString() === now.toDateString();
-      }
-      if (filterTime === "week") {
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        return showDate >= weekAgo;
-      }
-      if (filterTime === "month") {
-        return showDate.getMonth() === now.getMonth() && showDate.getFullYear() === now.getFullYear();
-      }
-      if (filterTime === "year") {
-        return showDate.getFullYear() === now.getFullYear();
-      }
+      if (filterTime === "today") return showDate.toDateString() === now.toDateString();
+      if (filterTime === "week") return showDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      if (filterTime === "month") return showDate.getMonth() === now.getMonth() && showDate.getFullYear() === now.getFullYear();
+      if (filterTime === "year") return showDate.getFullYear() === now.getFullYear();
       return true;
     });
   }, [replays, searchQuery, filterTime]);
@@ -119,6 +108,14 @@ const Home = () => {
     else toast.success("Replay berhasil dihapus!");
   };
 
+  const handleAdminMenuClick = (path: string, requireSuperAdmin = false) => {
+    if (requireSuperAdmin && !isSuperAdmin) {
+      toast.error("Akses ditolak! Hanya untuk Super Admin.");
+      return;
+    }
+    navigate(path);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
@@ -141,13 +138,23 @@ const Home = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate("/people")}>
+                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/people")}>
                     <Users className="w-4 h-4 mr-2" />
                     Pengguna
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/membership/admin")}>
+                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/membership/admin")}>
                     <CreditCard className="w-4 h-4 mr-2" />
                     Membership
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/replay-info")}>
+                    <KeyRound className="w-4 h-4 mr-2" />
+                    Info Replay
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/role/admin", true)}>
+                    <ShieldCheck className="w-4 h-4 mr-2" />
+                    Aktivasi Role
+                    {!isSuperAdmin && <span className="ml-auto text-xs text-destructive">🔒</span>}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -171,7 +178,6 @@ const Home = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Membership countdown */}
         {membership && !membership.isExpired && (
           <div className="mb-6">
             <MembershipCountdown membership={membership} />
@@ -201,15 +207,10 @@ const Home = () => {
         )}
 
         <div className="mb-6">
-          <h2 className="text-2xl font-display font-bold text-foreground mb-1">
-            Arsip Theater
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Tonton ulang pertunjukan theater online JKT48
-          </p>
+          <h2 className="text-2xl font-display font-bold text-foreground mb-1">Arsip Theater</h2>
+          <p className="text-muted-foreground text-sm">Tonton ulang pertunjukan theater online JKT48</p>
         </div>
 
-        {/* Search & Time Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
