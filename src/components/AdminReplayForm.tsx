@@ -26,7 +26,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       setTitle(editReplay.title);
       setYoutubeUrl(editReplay.youtube_url);
       setType(editReplay.type);
-      setShowTime(editReplay.show_time.slice(0, 16));
+      setShowTime(editReplay.show_time.slice(0, 10));
       setAccessKey(editReplay.access_key);
       setIsFree((editReplay as any).is_free ?? false);
     }
@@ -40,7 +40,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       title: title.trim(),
       youtube_url: youtubeUrl.trim(),
       type: type.trim(),
-      show_time: new Date(showTime).toISOString(),
+      show_time: new Date(showTime + "T00:00:00").toISOString(),
       access_key: isFree ? "FREE" : accessKey.trim(),
       is_free: isFree,
     };
@@ -95,7 +95,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
         required
       />
       <Input
-        type="datetime-local"
+        type="date"
         value={showTime}
         onChange={(e) => setShowTime(e.target.value)}
         className="bg-secondary border-border"
