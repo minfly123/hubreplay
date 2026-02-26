@@ -125,6 +125,39 @@ export type Database = {
         }
         Relationships: []
       }
+      role_invitations: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          created_at: string
+          created_by: string
+          id: string
+          is_used: boolean
+          target_role: Database["public"]["Enums"]["app_role"]
+          token: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          is_used?: boolean
+          target_role: Database["public"]["Enums"]["app_role"]
+          token: string
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_used?: boolean
+          target_role?: Database["public"]["Enums"]["app_role"]
+          token?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -155,9 +188,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_at_least_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -285,7 +320,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "super_admin"],
     },
   },
 } as const
