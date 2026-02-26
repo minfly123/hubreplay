@@ -35,8 +35,8 @@ const AccessKeyDialog = ({ open, onClose, onUnlock, title, isMasterKey }: Access
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass-card border-border sm:max-w-md">
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+      <DialogContent className="glass-card border-border sm:max-w-md" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2 text-foreground">
             <Lock className="w-5 h-5 text-primary" />

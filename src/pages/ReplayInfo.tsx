@@ -20,8 +20,13 @@ const ReplayInfo = () => {
     }
   }, [user, isAdmin, authLoading, navigate]);
 
+  const getWatchUrl = (replayId: string) => {
+    return `${window.location.origin}/watch/${replayId}`;
+  };
+
   const copyInfo = (replay: any) => {
-    const text = `🎬 Info Replay Hub Replay\n\n📌 Judul: ${replay.title}\n🎭 Tipe: ${replay.type}\n📅 Waktu Show: ${new Date(replay.show_time).toLocaleString("id-ID")}\n🔗 URL Replay: ${replay.youtube_url}\n🔑 Kunci Akses: ${replay.access_key}\n${replay.is_free ? "✅ Gratis" : "🔒 Berbayar"}\n\n⚠️ JANGAN membagikan kunci akses ini kepada siapapun!`;
+    const watchUrl = getWatchUrl(replay.id);
+    const text = `🎬 Info Replay Hub Replay\n\n📌 Judul: ${replay.title}\n🎭 Tipe: ${replay.type}\n📅 Waktu Show: ${new Date(replay.show_time).toLocaleString("id-ID")}\n🔗 Link Replay: ${watchUrl}\n🔑 Kunci Akses: ${replay.access_key}\n${replay.is_free ? "✅ Gratis" : "🔒 Berbayar"}\n\n⚠️ JANGAN membagikan kunci akses ini kepada siapapun!`;
     navigator.clipboard.writeText(text);
     setCopiedId(replay.id);
     toast.success("Info replay disalin!");
@@ -91,7 +96,7 @@ const ReplayInfo = () => {
                 </p>
                 <p className="flex items-center gap-1.5 break-all">
                   <Link2 className="w-3 h-3 shrink-0" />
-                  {r.youtube_url}
+                  {getWatchUrl(r.id)}
                 </p>
                 <p className="flex items-center gap-1.5 font-mono">
                   <Key className="w-3 h-3 shrink-0" />
