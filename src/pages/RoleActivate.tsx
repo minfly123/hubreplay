@@ -137,8 +137,8 @@ const RoleActivate = () => {
           <div className="space-y-3">
             <CheckCircle className="w-12 h-12 text-primary mx-auto" />
             <p className="text-primary font-medium">Role berhasil diaktivasi! 🎉</p>
-            <p className="text-sm text-muted-foreground">Silakan login ulang untuk mendapatkan akses penuh.</p>
-            <Button onClick={() => navigate("/")} className="gradient-primary text-primary-foreground glow-primary">
+            <p className="text-sm text-muted-foreground">Halaman akan dimuat ulang secara otomatis...</p>
+            <Button onClick={() => window.location.href = "/"} className="gradient-primary text-primary-foreground glow-primary">
               Ke Beranda
             </Button>
           </div>

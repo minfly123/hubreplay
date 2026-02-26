@@ -78,6 +78,7 @@ const Watch = () => {
     if (!replay) return;
     if (isAdmin || hasMembership || replay.is_free || (id && getUnlockedIds().has(id))) {
       setUnlocked(true);
+      setShowDialog(false);
     } else {
       setShowDialog(true);
     }
@@ -172,7 +173,7 @@ const Watch = () => {
 
       <AccessKeyDialog
         open={showDialog}
-        onClose={() => setShowDialog(false)}
+        onClose={() => navigate("/")}
         onUnlock={handleUnlock}
         title={replay.title}
       />
