@@ -3,11 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Play, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Play, CheckCircle, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 const DURATION_LABELS: Record<string, string> = {
-  "10_seconds": "10 Detik (Testing)",
   "1_week": "1 Minggu",
   "1_month": "1 Bulan",
   permanent: "Permanen",
@@ -17,7 +16,7 @@ const MembershipActivate = () => {
   const { token } = useParams();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<"loading" | "valid" | "invalid" | "used" | "activating" | "done">("loading");
+  const [status, setStatus] = useState<"loading" | "valid" | "invalid" | "used" | "activating" | "done" | "has_active">("loading");
   const [membership, setMembership] = useState<any>(null);
 
   useEffect(() => {
@@ -30,7 +29,25 @@ const MembershipActivate = () => {
   }, [user, authLoading, token]);
 
   const checkToken = async () => {
-    if (!token) { setStatus("invalid"); return; }
+    if (!token || !user) { setStatus("invalid"); return; }
+
+    // Check if user already has an active membership
+    const { data: existing } = await supabase
+      .from("memberships")
+      .select("*")
+      .eq("activated_by", user.id)
+      .eq("is_used", true)
+      .maybeSingle();
+
+    if (existing) {
+      const isPermanent = existing.duration === "permanent";
+      const isExpired = !isPermanent && existing.expires_at && new Date(existing.expires_at).getTime() <= Date.now();
+      if (!isExpired) {
+        setStatus("has_active");
+        return;
+      }
+    }
+
     const { data, error } = await supabase
       .from("memberships")
       .select("*")
@@ -49,9 +66,9 @@ const MembershipActivate = () => {
 
     const now = new Date();
     let expiresAt: string | null = null;
-    if (membership.duration === "10_seconds") {
-      expiresAt = new Date(now.getTime() + 10 * 1000).toISOString();
-    } else if (membership.duration === "1_week") {
+    if (membership.duration === "1_week") {
+      expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    } else if (membership.duration === "1_month") {
       expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
     } else if (membership.duration === "1_month") {
       expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -106,6 +123,15 @@ const MembershipActivate = () => {
             <XCircle className="w-12 h-12 text-muted-foreground mx-auto" />
             <p className="text-muted-foreground font-medium">Membership ini sudah digunakan.</p>
             <Button variant="outline" onClick={() => navigate("/")}>Kembali</Button>
+          </div>
+        )}
+
+        {status === "has_active" && (
+          <div className="space-y-3">
+            <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto" />
+            <p className="text-foreground font-medium">Kamu masih memiliki membership aktif!</p>
+            <p className="text-sm text-muted-foreground">Kamu tidak bisa mengaktivasi membership baru selama membership lama masih aktif.</p>
+            <Button variant="outline" onClick={() => navigate("/")}>Kembali ke Beranda</Button>
           </div>
         )}
 
