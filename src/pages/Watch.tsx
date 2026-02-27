@@ -4,40 +4,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMembership } from "@/hooks/useMembership";
 import YouTubePlayer from "@/components/YouTubePlayer";
-import AccessKeyDialog from "@/components/AccessKeyDialog";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Tag, Play } from "lucide-react";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import type { Replay } from "@/hooks/useReplays";
 
-const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
-
-const getUnlockedIds = (): Set<string> => {
-  try {
-    const raw = localStorage.getItem(UNLOCKED_STORAGE_KEY);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch { return new Set(); }
-};
-
-const saveUnlockedId = (id: string) => {
-  const ids = getUnlockedIds();
-  ids.add(id);
-  localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
-};
-
 const Watch = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const { isActive: hasMembership } = useMembership();
   const [replay, setReplay] = useState<Replay | null>(null);
   const [loading, setLoading] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
+  const [checking, setChecking] = useState(true);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
-  // Wake Lock - prevent screen from sleeping
+  // Wake Lock
   useEffect(() => {
     const requestWakeLock = async () => {
       try {
@@ -47,20 +31,17 @@ const Watch = () => {
       } catch {}
     };
     requestWakeLock();
-
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        requestWakeLock();
-      }
+      if (document.visibilityState === "visible") requestWakeLock();
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       wakeLockRef.current?.release().catch(() => {});
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
+  // Fetch replay
   useEffect(() => {
     const fetchReplay = async () => {
       const { data } = await supabase
@@ -74,27 +55,61 @@ const Watch = () => {
     fetchReplay();
   }, [id]);
 
+  // Check access
   useEffect(() => {
-    if (!replay) return;
-    if (isAdmin || hasMembership || replay.is_free || (id && getUnlockedIds().has(id))) {
-      setUnlocked(true);
-      setShowDialog(false);
-    } else {
-      setShowDialog(true);
-    }
-  }, [isAdmin, id, replay, hasMembership]);
+    if (authLoading || loading || !replay) return;
 
-  const handleUnlock = (key: string): boolean => {
-    if (!replay) return false;
-    if (key === replay.access_key) {
-      setUnlocked(true);
-      saveUnlockedId(replay.id);
-      return true;
-    }
-    return false;
-  };
+    const checkAccess = async () => {
+      // Free shows: always unlocked
+      if (replay.is_free) {
+        setUnlocked(true);
+        setChecking(false);
+        return;
+      }
 
-  if (loading) {
+      // Admin/Super Admin: always unlocked
+      if (isAdmin) {
+        setUnlocked(true);
+        setChecking(false);
+        return;
+      }
+
+      // Membership holders: always unlocked
+      if (hasMembership) {
+        setUnlocked(true);
+        setChecking(false);
+        return;
+      }
+
+      // Check if user has unlocked this replay via token
+      if (user) {
+        const { data } = await supabase
+          .from("replay_unlocks")
+          .select("id")
+          .eq("replay_id", replay.id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (data) {
+          setUnlocked(true);
+          setChecking(false);
+          return;
+        }
+      }
+
+      // Not unlocked - show denial
+      setUnlocked(false);
+      setChecking(false);
+
+      // Show alert and redirect
+      window.alert("Akses ditolak!\n\nKamu perlu membukanya dengan URL kunci. Minta URL kunci dari admin untuk menonton replay ini.");
+      navigate("/", { replace: true });
+    };
+
+    checkAccess();
+  }, [authLoading, loading, replay, isAdmin, hasMembership, user, id, navigate]);
+
+  if (loading || authLoading || checking) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
@@ -110,6 +125,8 @@ const Watch = () => {
       </div>
     );
   }
+
+  if (!unlocked) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,52 +148,25 @@ const Watch = () => {
       </header>
 
       <main className="container mx-auto px-4 py-6 max-w-5xl">
-        {unlocked ? (
-          <div className="animate-fade-in">
-            <YouTubePlayer url={replay.youtube_url} />
-            <div className="mt-6">
-              <h1 className="text-2xl font-display font-bold text-foreground mb-3">
-                {replay.title}
-              </h1>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Tag className="w-4 h-4" />
-                  {replay.type}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  {format(new Date(replay.show_time), "d MMMM yyyy, HH:mm", { locale: idLocale })}
-                </span>
-              </div>
+        <div className="animate-fade-in">
+          <YouTubePlayer url={replay.youtube_url} />
+          <div className="mt-6">
+            <h1 className="text-2xl font-display font-bold text-foreground mb-3">
+              {replay.title}
+            </h1>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Tag className="w-4 h-4" />
+                {replay.type}
+              </span>
+              <span className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                {format(new Date(replay.show_time), "d MMMM yyyy", { locale: idLocale })}
+              </span>
             </div>
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Play className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h2 className="text-xl font-display font-semibold text-foreground mb-2">
-              Masukkan Kunci Akses
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              Show ini memerlukan kunci akses untuk ditonton.
-            </p>
-            <Button
-              onClick={() => setShowDialog(true)}
-              className="gradient-primary text-primary-foreground glow-primary"
-            >
-              Masukkan Kunci
-            </Button>
-          </div>
-        )}
+        </div>
       </main>
-
-      <AccessKeyDialog
-        open={showDialog}
-        onClose={() => navigate("/")}
-        onUnlock={handleUnlock}
-        title={replay.title}
-      />
     </div>
   );
 };
