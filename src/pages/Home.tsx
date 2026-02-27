@@ -21,20 +21,6 @@ import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search, Menu, U
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-const UNLOCKED_STORAGE_KEY = "hub_replay_unlocked_ids";
-
-const getUnlockedIds = (): Set<string> => {
-  try {
-    const raw = localStorage.getItem(UNLOCKED_STORAGE_KEY);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch { return new Set(); }
-};
-
-const saveUnlockedId = (id: string) => {
-  const ids = getUnlockedIds();
-  ids.add(id);
-  localStorage.setItem(UNLOCKED_STORAGE_KEY, JSON.stringify([...ids]));
-};
 
 const TIME_FILTERS = [
   { key: "all", label: "Semua" },
@@ -50,7 +36,7 @@ const Home = () => {
   const { membership, isActive: hasMembership } = useMembership();
   const navigate = useNavigate();
 
-  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(getUnlockedIds());
+  const [userUnlocks, setUserUnlocks] = useState<Set<string>>(new Set());
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [editReplay, setEditReplay] = useState<Replay | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -60,6 +46,21 @@ const Home = () => {
   useEffect(() => {
     if (!hasSeenWelcome()) setShowWelcome(true);
   }, []);
+
+  // Fetch user's unlocked replays from database
+  useEffect(() => {
+    const fetchUnlocks = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("replay_unlocks")
+        .select("replay_id")
+        .eq("user_id", user.id);
+      if (data) {
+        setUserUnlocks(new Set(data.map((d) => d.replay_id)));
+      }
+    };
+    fetchUnlocks();
+  }, [user]);
 
   const filteredReplays = useMemo(() => {
     const now = new Date();
@@ -77,7 +78,7 @@ const Home = () => {
   }, [replays, searchQuery, filterTime]);
 
   const isReplayUnlocked = (replay: Replay) => {
-    return isAdmin || hasMembership || replay.is_free || unlockedIds.has(replay.id);
+    return isAdmin || hasMembership || replay.is_free || userUnlocks.has(replay.id);
   };
 
   const handleWatch = (replay: Replay) => {

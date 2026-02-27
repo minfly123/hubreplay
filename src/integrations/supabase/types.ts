@@ -171,7 +171,6 @@ export type Database = {
       }
       replays: {
         Row: {
-          access_key: string
           created_at: string
           id: string
           is_free: boolean
@@ -182,7 +181,6 @@ export type Database = {
           youtube_url: string
         }
         Insert: {
-          access_key: string
           created_at?: string
           id?: string
           is_free?: boolean
@@ -193,7 +191,6 @@ export type Database = {
           youtube_url: string
         }
         Update: {
-          access_key?: string
           created_at?: string
           id?: string
           is_free?: boolean

@@ -7,7 +7,6 @@ export interface Replay {
   youtube_url: string;
   type: string;
   show_time: string;
-  access_key: string;
   is_free: boolean;
   created_at: string;
   updated_at: string;
