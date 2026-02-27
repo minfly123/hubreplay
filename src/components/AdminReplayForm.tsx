@@ -17,7 +17,6 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [type, setType] = useState("Theater");
   const [showTime, setShowTime] = useState("");
-  const [accessKey, setAccessKey] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +26,6 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       setYoutubeUrl(editReplay.youtube_url);
       setType(editReplay.type);
       setShowTime(editReplay.show_time.slice(0, 10));
-      setAccessKey(editReplay.access_key);
       setIsFree((editReplay as any).is_free ?? false);
     }
   }, [editReplay]);
@@ -41,7 +39,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       youtube_url: youtubeUrl.trim(),
       type: type.trim(),
       show_time: new Date(showTime + "T00:00:00").toISOString(),
-      access_key: isFree ? "FREE" : accessKey.trim(),
+      access_key: isFree ? "FREE" : "LOCKED",
       is_free: isFree,
     };
 
@@ -64,7 +62,6 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
     setYoutubeUrl("");
     setType("Theater");
     setShowTime("");
-    setAccessKey("");
     setIsFree(false);
   };
 
@@ -102,23 +99,12 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
         required
       />
 
-      {/* Free/Paid toggle */}
       <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border">
         <Switch id="is-free" checked={isFree} onCheckedChange={setIsFree} />
         <Label htmlFor="is-free" className="text-foreground font-medium cursor-pointer">
-          {isFree ? "Show Gratis (Tanpa Kunci)" : "Show Berbayar (Perlu Kunci Akses)"}
+          {isFree ? "Show Gratis (Bebas Akses)" : "Show Berbayar (Perlu URL Kunci)"}
         </Label>
       </div>
-
-      {!isFree && (
-        <Input
-          placeholder="Kunci Akses"
-          value={accessKey}
-          onChange={(e) => setAccessKey(e.target.value)}
-          className="bg-secondary border-border"
-          required={!isFree}
-        />
-      )}
 
       <div className="flex gap-3">
         <Button

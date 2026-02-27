@@ -13,6 +13,7 @@ import MembershipActivate from "./pages/MembershipActivate";
 import RoleAdmin from "./pages/RoleAdmin";
 import RoleActivate from "./pages/RoleActivate";
 import ReplayInfo from "./pages/ReplayInfo";
+import ReplayUnlock from "./pages/ReplayUnlock";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/role/admin" element={<RoleAdmin />} />
             <Route path="/role/:token" element={<RoleActivate />} />
             <Route path="/replay-info" element={<ReplayInfo />} />
+            <Route path="/unlock/:token" element={<ReplayUnlock />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

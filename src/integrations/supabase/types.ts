@@ -89,6 +89,86 @@ export type Database = {
         }
         Relationships: []
       }
+      replay_unlock_tokens: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          is_used: boolean
+          replay_id: string
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          replay_id: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          replay_id?: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replay_unlock_tokens_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      replay_unlocks: {
+        Row: {
+          id: string
+          replay_id: string
+          token_id: string | null
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          replay_id: string
+          token_id?: string | null
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          replay_id?: string
+          token_id?: string | null
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replay_unlocks_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "replay_unlocks_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "replay_unlock_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       replays: {
         Row: {
           access_key: string
