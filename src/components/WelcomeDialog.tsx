@@ -43,9 +43,9 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
               <Lock className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h4 className="font-semibold text-foreground text-sm">Kunci Akses</h4>
+              <h4 className="font-semibold text-foreground text-sm">URL Kunci (Baru!)</h4>
               <p className="text-muted-foreground text-sm">
-                Setiap show berbayar memiliki kunci akses tersendiri. Masukkan kunci untuk membuka dan menonton replay.
+                Setiap show berbayar dibuka menggunakan <strong>URL kunci</strong> sekali pakai. Cukup buka linknya, dan replay terbuka permanen di akunmu.
               </p>
             </div>
           </div>
@@ -57,7 +57,7 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
             <div>
               <h4 className="font-semibold text-foreground text-sm">Membership</h4>
               <p className="text-muted-foreground text-sm">
-                Dengan membership, <strong>semua show</strong> terbuka selama masa aktif. Tersedia paket 1 minggu, 1 bulan, atau permanen.
+                Dengan membership, <strong>semua show</strong> terbuka otomatis selama masa aktif. Tersedia paket 1 minggu, 1 bulan, atau permanen.
               </p>
             </div>
           </div>
@@ -67,9 +67,9 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
               <MessageCircle className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <h4 className="font-semibold text-foreground text-sm">Beli Kunci Akses / Membership</h4>
+              <h4 className="font-semibold text-foreground text-sm">Beli URL Kunci / Membership</h4>
               <p className="text-muted-foreground text-sm">
-                Hubungi admin melalui WhatsApp untuk membeli kunci akses atau membership:
+                Hubungi admin melalui WhatsApp untuk membeli URL kunci atau membership:
               </p>
               <a
                 href="https://wa.me/62895351456586"
