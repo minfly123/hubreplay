@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useReplays, Replay } from "@/hooks/useReplays";
 import { useMembership } from "@/hooks/useMembership";
 import ReplayCard from "@/components/ReplayCard";
-import AccessKeyDialog from "@/components/AccessKeyDialog";
+
 import AdminReplayForm from "@/components/AdminReplayForm";
 import WelcomeDialog, { hasSeenWelcome } from "@/components/WelcomeDialog";
 import MembershipCountdown from "@/components/MembershipCountdown";
@@ -51,8 +51,6 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(getUnlockedIds());
-  const [selectedReplay, setSelectedReplay] = useState<Replay | null>(null);
-  const [showAccessDialog, setShowAccessDialog] = useState(false);
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [editReplay, setEditReplay] = useState<Replay | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -86,19 +84,8 @@ const Home = () => {
     if (replay.is_free || isReplayUnlocked(replay)) {
       navigate(`/watch/${replay.id}`);
     } else {
-      setSelectedReplay(replay);
-      setShowAccessDialog(true);
+      toast.error("Akses ditolak! Kamu perlu membukanya dengan URL kunci.");
     }
-  };
-
-  const handleUnlock = (key: string): boolean => {
-    if (!selectedReplay) return false;
-    if (key === selectedReplay.access_key) {
-      saveUnlockedId(selectedReplay.id);
-      setUnlockedIds((prev) => new Set([...prev, selectedReplay.id]));
-      return true;
-    }
-    return false;
   };
 
   const handleDelete = async (id: string) => {
@@ -277,12 +264,8 @@ const Home = () => {
         )}
       </main>
 
-      <AccessKeyDialog
-        open={showAccessDialog}
-        onClose={() => setShowAccessDialog(false)}
-        onUnlock={handleUnlock}
-        title={selectedReplay?.title ?? ""}
-      />
+
+
       <WelcomeDialog
         open={showWelcome}
         onClose={() => setShowWelcome(false)}
