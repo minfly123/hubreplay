@@ -3,21 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useReplays, Replay } from "@/hooks/useReplays";
 import { useMembership } from "@/hooks/useMembership";
+import AppNavigation from "@/components/AppNavigation";
 import ReplayCard from "@/components/ReplayCard";
-
 import AdminReplayForm from "@/components/AdminReplayForm";
 import WelcomeDialog, { hasSeenWelcome } from "@/components/WelcomeDialog";
 import MembershipCountdown from "@/components/MembershipCountdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Play, LogOut, Shield, Plus, Trash2, Pencil, HelpCircle, Search, Menu, Users, CreditCard, ShieldCheck, Film, KeyRound } from "lucide-react";
+import { Plus, Trash2, Pencil, Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,12 +24,13 @@ const TIME_FILTERS = [
 ];
 
 const Home = () => {
-  const { user, isAdmin, isSuperAdmin, signOut } = useAuth();
+  const { user, isAdmin, isSuperAdmin } = useAuth();
   const { replays, loading } = useReplays();
   const { membership, isActive: hasMembership } = useMembership();
   const navigate = useNavigate();
 
   const [userUnlocks, setUserUnlocks] = useState<Set<string>>(new Set());
+  const [playlistReplayIds, setPlaylistReplayIds] = useState<Set<string>>(new Set());
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [editReplay, setEditReplay] = useState<Replay | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -47,19 +41,32 @@ const Home = () => {
     if (!hasSeenWelcome()) setShowWelcome(true);
   }, []);
 
-  // Fetch user's unlocked replays from database
+  // Fetch user's unlocked replays and playlist replays
   useEffect(() => {
-    const fetchUnlocks = async () => {
+    const fetchAccess = async () => {
       if (!user) return;
-      const { data } = await supabase
+      // Unlocks
+      const { data: unlockData } = await supabase
         .from("replay_unlocks")
         .select("replay_id")
         .eq("user_id", user.id);
-      if (data) {
-        setUserUnlocks(new Set(data.map((d) => d.replay_id)));
+      if (unlockData) setUserUnlocks(new Set(unlockData.map((d) => d.replay_id)));
+
+      // Playlist replays
+      const { data: userPlaylists } = await supabase
+        .from("user_playlists")
+        .select("playlist_id")
+        .eq("user_id", user.id);
+      if (userPlaylists && userPlaylists.length > 0) {
+        const pIds = userPlaylists.map((up) => up.playlist_id);
+        const { data: items } = await supabase
+          .from("playlist_items")
+          .select("replay_id")
+          .in("playlist_id", pIds);
+        if (items) setPlaylistReplayIds(new Set(items.map((i) => i.replay_id)));
       }
     };
-    fetchUnlocks();
+    fetchAccess();
   }, [user]);
 
   const filteredReplays = useMemo(() => {
@@ -78,7 +85,7 @@ const Home = () => {
   }, [replays, searchQuery, filterTime]);
 
   const isReplayUnlocked = (replay: Replay) => {
-    return isAdmin || hasMembership || replay.is_free || userUnlocks.has(replay.id);
+    return isAdmin || hasMembership || replay.is_free || userUnlocks.has(replay.id) || playlistReplayIds.has(replay.id);
   };
 
   const handleWatch = (replay: Replay) => {
@@ -96,74 +103,9 @@ const Home = () => {
     else toast.success("Replay berhasil dihapus!");
   };
 
-  const handleAdminMenuClick = (path: string, requireSuperAdmin = false) => {
-    if (requireSuperAdmin && !isSuperAdmin) {
-      toast.error("Akses ditolak! Hanya untuk Super Admin.");
-      return;
-    }
-    navigate(path);
-  };
-
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center glow-primary">
-              <Play className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <h1 className="text-xl font-display font-bold text-foreground">
-              Hub <span className="text-gradient">Replay</span>
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            {isAdmin && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1.5">
-                    <Menu className="w-4 h-4" />
-                    <Shield className="w-3 h-3 text-primary" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/people")}>
-                    <Users className="w-4 h-4 mr-2" />
-                    Pengguna
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/membership/admin")}>
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Membership
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/replay-info")}>
-                    <KeyRound className="w-4 h-4 mr-2" />
-                    Info Replay
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleAdminMenuClick("/role/admin", true)}>
-                    <ShieldCheck className="w-4 h-4 mr-2" />
-                    Aktivasi Role
-                    {!isSuperAdmin && <span className="ml-auto text-xs text-destructive">🔒</span>}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowWelcome(true)}
-              className="text-muted-foreground"
-            >
-              <HelpCircle className="w-4 h-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground hidden sm:block">
-              {user?.email}
-            </span>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AppNavigation onOpenWelcome={() => setShowWelcome(true)} />
 
       <main className="container mx-auto px-4 py-8">
         {membership && !membership.isExpired && (

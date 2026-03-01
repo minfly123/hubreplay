@@ -7,6 +7,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Watch from "./pages/Watch";
+import Group from "./pages/Group";
+import GroupInvite from "./pages/GroupInvite";
 import People from "./pages/People";
 import MembershipAdmin from "./pages/MembershipAdmin";
 import MembershipActivate from "./pages/MembershipActivate";
@@ -29,6 +31,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/watch/:id" element={<Watch />} />
+            <Route path="/group" element={<Group />} />
+            <Route path="/group/invite/:token" element={<GroupInvite />} />
             <Route path="/people" element={<People />} />
             <Route path="/membership/admin" element={<MembershipAdmin />} />
             <Route path="/membership/:token" element={<MembershipActivate />} />
