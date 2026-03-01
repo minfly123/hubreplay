@@ -68,6 +68,69 @@ export type Database = {
         }
         Relationships: []
       }
+      playlist_items: {
+        Row: {
+          added_at: string
+          id: string
+          playlist_id: string
+          replay_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          playlist_id: string
+          replay_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          playlist_id?: string
+          replay_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_items_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -234,6 +297,38 @@ export type Database = {
           token?: string
         }
         Relationships: []
+      }
+      user_playlists: {
+        Row: {
+          added_at: string
+          custom_name: string | null
+          id: string
+          playlist_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          custom_name?: string | null
+          id?: string
+          playlist_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          custom_name?: string | null
+          id?: string
+          playlist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_playlists_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

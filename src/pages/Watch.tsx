@@ -95,6 +95,29 @@ const Watch = () => {
           setChecking(false);
           return;
         }
+
+        // Check if user has this replay via a playlist
+        const { data: userPlaylists } = await supabase
+          .from("user_playlists")
+          .select("playlist_id")
+          .eq("user_id", user.id);
+
+        if (userPlaylists && userPlaylists.length > 0) {
+          const playlistIds = userPlaylists.map((up) => up.playlist_id);
+          const { data: playlistItem } = await supabase
+            .from("playlist_items")
+            .select("id")
+            .eq("replay_id", replay.id)
+            .in("playlist_id", playlistIds)
+            .limit(1)
+            .maybeSingle();
+
+          if (playlistItem) {
+            setUnlocked(true);
+            setChecking(false);
+            return;
+          }
+        }
       }
 
       // Not unlocked - show denial
