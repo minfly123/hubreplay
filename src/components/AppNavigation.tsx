@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, Store, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -70,6 +70,20 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                 >
                   <ListVideo className="w-4 h-4" />
                   Group
+                </button>
+                <button
+                  onClick={() => go("/store")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/store") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Store className="w-4 h-4" />
+                  Store
+                </button>
+                <button
+                  onClick={() => go("/reseller")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/reseller") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Reseller
                 </button>
 
                 {isAdmin && (

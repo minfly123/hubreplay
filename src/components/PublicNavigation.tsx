@@ -21,24 +21,6 @@ const PublicNavigation = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            variant={isActive("/store") ? "default" : "outline"}
-            size="sm"
-            onClick={() => navigate("/store")}
-            className={isActive("/store") ? "gradient-primary text-primary-foreground" : ""}
-          >
-            <Store className="w-4 h-4 mr-1.5" />
-            Store
-          </Button>
-          <Button
-            variant={isActive("/reseller") ? "default" : "outline"}
-            size="sm"
-            onClick={() => navigate("/reseller")}
-            className={isActive("/reseller") ? "gradient-primary text-primary-foreground" : ""}
-          >
-            <Users className="w-4 h-4 mr-1.5" />
-            Reseller
-          </Button>
-          <Button
             size="sm"
             variant={isActive("/auth") ? "default" : "outline"}
             onClick={() => navigate("/auth")}
