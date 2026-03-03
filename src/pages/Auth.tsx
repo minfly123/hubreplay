@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useNavigate } from "react-router-dom";
+import PublicNavigation from "@/components/PublicNavigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -46,8 +47,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen bg-background">
+      <PublicNavigation />
+      <div className="flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -126,6 +129,7 @@ const Auth = () => {
               {isLogin ? "Daftar" : "Masuk"}
             </button>
           </p>
+        </div>
         </div>
       </div>
     </div>

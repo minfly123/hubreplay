@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Play, Check, MessageCircle, Crown, Ticket, Tv, Clock, Globe, Shield, CreditCard } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { MessageCircle, Crown, Ticket, Tv, Clock, Globe, Shield } from "lucide-react";
+import PublicNavigation from "@/components/PublicNavigation";
 
 const benefits = [
   { icon: Tv, text: "Kualitas hingga 1080p" },
@@ -22,31 +22,9 @@ const prices = [
 const WA_LINK = "https://wa.me/+62895351456586";
 
 const Store = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-            <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center glow-primary">
-              <Play className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <h1 className="text-xl font-display font-bold text-foreground">
-              Hub <span className="text-gradient">Replay</span>
-            </h1>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => navigate("/reseller")}>
-              Reseller
-            </Button>
-            <Button size="sm" className="gradient-primary text-primary-foreground" onClick={() => navigate("/auth")}>
-              Login
-            </Button>
-          </div>
-        </div>
-      </header>
+      <PublicNavigation />
 
       {/* Hero */}
       <section className="container mx-auto px-4 py-16 text-center">
