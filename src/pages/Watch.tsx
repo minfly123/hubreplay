@@ -1,14 +1,27 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useMembership } from "@/hooks/useMembership";
-import YouTubePlayer from "@/components/YouTubePlayer";
+import YouTubePlayer, { YouTubePlayerHandle } from "@/components/YouTubePlayer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Tag, Play } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, Play, SkipForward, X } from "lucide-react";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+import { toast } from "sonner";
 import type { Replay } from "@/hooks/useReplays";
+import {
+  saveProgress,
+  getProgress,
+  clearProgress,
+  cleanupOldEntries,
+  formatSecondsToTime,
+} from "@/hooks/useWatchProgress";
+
+const getYoutubeId = (url: string): string => {
+  const match = url.match(/(?:live\/|v=|youtu\.be\/)([^?&]+)/);
+  return match?.[1] ?? "";
+};
 
 const Watch = () => {
   const { id } = useParams();
@@ -20,6 +33,22 @@ const Watch = () => {
   const [unlocked, setUnlocked] = useState(false);
   const [checking, setChecking] = useState(true);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const playerRef = useRef<YouTubePlayerHandle>(null);
+
+  // Auto-resume
+  const [resumePrompt, setResumePrompt] = useState<number | null>(null);
+  const lastSaveRef = useRef(0);
+
+  // Autoplay next
+  const [showAutoplay, setShowAutoplay] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  const [nextReplay, setNextReplay] = useState<Replay | null>(null);
+  const countdownRef = useRef<number | null>(null);
+
+  // Cleanup old entries on mount
+  useEffect(() => {
+    cleanupOldEntries();
+  }, []);
 
   // Wake Lock
   useEffect(() => {
@@ -60,28 +89,28 @@ const Watch = () => {
     if (authLoading || loading || !replay) return;
 
     const checkAccess = async () => {
-      // Free shows: always unlocked
+      // Free shows
       if (replay.is_free) {
         setUnlocked(true);
         setChecking(false);
         return;
       }
 
-      // Admin/Super Admin: always unlocked
+      // Admin/Super Admin
       if (isAdmin) {
         setUnlocked(true);
         setChecking(false);
         return;
       }
 
-      // Membership holders: always unlocked
+      // Membership holders
       if (hasMembership) {
         setUnlocked(true);
         setChecking(false);
         return;
       }
 
-      // Check if user has unlocked this replay via token
+      // Check token unlock
       if (user) {
         const { data } = await supabase
           .from("replay_unlocks")
@@ -96,7 +125,7 @@ const Watch = () => {
           return;
         }
 
-        // Check if user has this replay via a playlist
+        // Check playlist access
         const { data: userPlaylists } = await supabase
           .from("user_playlists")
           .select("playlist_id")
@@ -120,17 +149,101 @@ const Watch = () => {
         }
       }
 
-      // Not unlocked - show denial
+      // Not unlocked - redirect without popup for authorized users
       setUnlocked(false);
       setChecking(false);
-
-      // Show alert and redirect
-      window.alert("Akses ditolak!\n\nKamu perlu membukanya dengan URL kunci. Minta URL kunci dari admin untuk menonton replay ini.");
+      toast.error("Akses ditolak! Kamu perlu membukanya dengan URL kunci dari admin.");
       navigate("/", { replace: true });
     };
 
     checkAccess();
   }, [authLoading, loading, replay, isAdmin, hasMembership, user, id, navigate]);
+
+  // Auto-resume: check saved progress when replay loads
+  useEffect(() => {
+    if (!replay) return;
+    const videoId = getYoutubeId(replay.youtube_url);
+    const saved = getProgress(videoId);
+    if (saved > 5) {
+      setResumePrompt(saved);
+    }
+  }, [replay]);
+
+  // Save progress every ~1 second via onTimeUpdate
+  const handleTimeUpdate = useCallback((time: number) => {
+    if (!replay) return;
+    const now = Date.now();
+    if (now - lastSaveRef.current >= 1000) {
+      lastSaveRef.current = now;
+      const videoId = getYoutubeId(replay.youtube_url);
+      saveProgress(videoId, time);
+    }
+  }, [replay]);
+
+  // Fetch next replay for autoplay
+  useEffect(() => {
+    if (!replay) return;
+    const fetchNext = async () => {
+      const { data } = await supabase
+        .from("replays")
+        .select("*")
+        .lt("show_time", replay.show_time)
+        .order("show_time", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setNextReplay(data ?? null);
+    };
+    fetchNext();
+  }, [replay]);
+
+  // Handle video ended
+  const handleEnded = useCallback(() => {
+    if (!replay) return;
+    const videoId = getYoutubeId(replay.youtube_url);
+    clearProgress(videoId);
+
+    if (nextReplay) {
+      setShowAutoplay(true);
+      setCountdown(5);
+    }
+  }, [replay, nextReplay]);
+
+  // Countdown for autoplay
+  useEffect(() => {
+    if (!showAutoplay) return;
+    countdownRef.current = window.setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(countdownRef.current!);
+          navigate(`/watch/${nextReplay!.id}`, { replace: true });
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, [showAutoplay, nextReplay, navigate]);
+
+  const handleResume = () => {
+    if (resumePrompt && playerRef.current) {
+      playerRef.current.seekTo(resumePrompt);
+    }
+    setResumePrompt(null);
+  };
+
+  const handleStartFresh = () => {
+    if (replay) {
+      clearProgress(getYoutubeId(replay.youtube_url));
+    }
+    setResumePrompt(null);
+  };
+
+  const cancelAutoplay = () => {
+    setShowAutoplay(false);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+  };
 
   if (loading || authLoading || checking) {
     return (
@@ -171,8 +284,63 @@ const Watch = () => {
       </header>
 
       <main className="container mx-auto px-4 py-6 max-w-5xl">
-        <div className="animate-fade-in">
-          <YouTubePlayer url={replay.youtube_url} />
+        <div className="animate-fade-in relative">
+          <YouTubePlayer
+            ref={playerRef}
+            url={replay.youtube_url}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleEnded}
+          />
+
+          {/* Resume prompt overlay */}
+          {resumePrompt !== null && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-lg">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-2xl max-w-sm mx-4 text-center space-y-4">
+                <p className="text-foreground font-medium">
+                  Lanjutkan dari {formatSecondsToTime(resumePrompt)}?
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button size="sm" onClick={handleResume}>
+                    <Play className="w-4 h-4 mr-1" />
+                    Lanjutkan
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleStartFresh}>
+                    Mulai Ulang
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Autoplay next overlay */}
+          {showAutoplay && nextReplay && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm rounded-lg">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-2xl max-w-sm mx-4 text-center space-y-4">
+                <p className="text-muted-foreground text-sm">Berikutnya dalam</p>
+                <div className="text-4xl font-bold text-primary">{countdown}</div>
+                <p className="text-foreground font-medium text-sm truncate">
+                  {nextReplay.title}
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      cancelAutoplay();
+                      navigate(`/watch/${nextReplay.id}`, { replace: true });
+                    }}
+                  >
+                    <SkipForward className="w-4 h-4 mr-1" />
+                    Putar Sekarang
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={cancelAutoplay}>
+                    <X className="w-4 h-4 mr-1" />
+                    Batal
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mt-6">
             <h1 className="text-2xl font-display font-bold text-foreground mb-3">
               {replay.title}

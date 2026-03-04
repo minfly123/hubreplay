@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -14,6 +14,13 @@ import {
 
 interface YouTubePlayerProps {
   url: string;
+  onTimeUpdate?: (time: number) => void;
+  onEnded?: () => void;
+  initialTime?: number;
+}
+
+export interface YouTubePlayerHandle {
+  seekTo: (time: number) => void;
 }
 
 const getYoutubeId = (url: string): string => {
@@ -43,7 +50,8 @@ declare global {
   }
 }
 
-const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
+const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
+  ({ url, onTimeUpdate, onEnded, initialTime }, ref) => {
   const videoId = getYoutubeId(url);
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
@@ -63,6 +71,13 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
   const hideTimeoutRef = useRef<number | null>(null);
   const [isSeeking, setIsSeeking] = useState(false);
   const seekValueRef = useRef<number>(0);
+  const initialSeeked = useRef(false);
+
+  // Callbacks refs to avoid stale closures
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  onTimeUpdateRef.current = onTimeUpdate;
+  const onEndedRef = useRef(onEnded);
+  onEndedRef.current = onEnded;
 
   // Long-press 2x speed
   const [longPressActive, setLongPressActive] = useState(false);
@@ -74,6 +89,15 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
   const tapTimer = useRef<number | null>(null);
   const tapCount = useRef(0);
   const tapSide = useRef<"left" | "right">("right");
+
+  useImperativeHandle(ref, () => ({
+    seekTo: (time: number) => {
+      if (playerRef.current?.seekTo) {
+        playerRef.current.seekTo(time, true);
+        setCurrentTime(time);
+      }
+    },
+  }));
 
   const loadYTAPI = useCallback(() => {
     if (window.YT && window.YT.Player) return Promise.resolve();
@@ -93,6 +117,7 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
 
   useEffect(() => {
     if (!videoId) return;
+    initialSeeked.current = false;
 
     loadYTAPI().then(() => {
       const playerDiv = document.createElement("div");
@@ -125,9 +150,13 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
           onReady: (e: any) => {
             setDuration(e.target.getDuration());
             setReady(true);
-            // Get available qualities
             const quals = e.target.getAvailableQualityLevels?.() || [];
             setAvailableQualities(quals);
+            // Seek to initial time if provided
+            if (initialTime && initialTime > 0 && !initialSeeked.current) {
+              initialSeeked.current = true;
+              // Don't auto-seek here; let Watch page handle via ref after prompt
+            }
           },
           onStateChange: (e: any) => {
             setPlaying(e.data === window.YT.PlayerState.PLAYING);
@@ -135,6 +164,9 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
               setDuration(playerRef.current.getDuration());
               const quals = playerRef.current.getAvailableQualityLevels?.() || [];
               if (quals.length) setAvailableQualities(quals);
+            }
+            if (e.data === window.YT.PlayerState.ENDED) {
+              onEndedRef.current?.();
             }
           },
           onPlaybackQualityChange: (e: any) => {
@@ -150,12 +182,14 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     };
   }, [videoId, loadYTAPI]);
 
-  // Time tracking - pause updates while seeking
+  // Time tracking
   useEffect(() => {
     if (playing && !isSeeking) {
       intervalRef.current = window.setInterval(() => {
         if (playerRef.current?.getCurrentTime) {
-          setCurrentTime(playerRef.current.getCurrentTime());
+          const t = playerRef.current.getCurrentTime();
+          setCurrentTime(t);
+          onTimeUpdateRef.current?.(t);
         }
       }, 250);
     } else if (intervalRef.current) {
@@ -192,7 +226,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     else playerRef.current.playVideo();
   };
 
-  // Seeking: stop time updates, track locally, commit on release
   const handleSeekStart = () => {
     setIsSeeking(true);
     seekValueRef.current = currentTime;
@@ -271,7 +304,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
       : `${m}:${sec.toString().padStart(2, "0")}`;
   };
 
-  // Skip 10 seconds
   const skip = (seconds: number) => {
     if (!playerRef.current) return;
     const cur = playerRef.current.getCurrentTime();
@@ -280,7 +312,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     setCurrentTime(target);
   };
 
-  // Double-tap detection for skip, single tap for controls toggle
   const handleOverlayClick = (e: React.MouseEvent | React.TouchEvent) => {
     if ((e.target as HTMLElement).closest(".player-controls")) return;
     if ((e.target as HTMLElement).closest(".center-play-btn")) return;
@@ -296,7 +327,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
 
     if (tapCount.current === 1) {
       tapTimer.current = window.setTimeout(() => {
-        // Single tap: toggle controls
         if (!showControls) {
           revealControls();
         } else {
@@ -305,7 +335,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         tapCount.current = 0;
       }, 250);
     } else if (tapCount.current === 2) {
-      // Double tap: skip
       if (tapTimer.current) clearTimeout(tapTimer.current);
       tapCount.current = 0;
       const skipAmount = side === "right" ? 10 : -10;
@@ -315,18 +344,15 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     }
   };
 
-  // Clear skip indicator after animation
   useEffect(() => {
     if (!skipIndicator) return;
     const t = setTimeout(() => setSkipIndicator(null), 700);
     return () => clearTimeout(t);
   }, [skipIndicator]);
 
-  // Long press handlers for 2x speed
   const handleTouchStart = (e: React.TouchEvent) => {
     if ((e.target as HTMLElement).closest(".player-controls")) return;
     if ((e.target as HTMLElement).closest(".center-play-btn")) return;
-
     longPressTimer.current = window.setTimeout(() => {
       if (!playerRef.current) return;
       originalSpeed.current = speed;
@@ -348,11 +374,9 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     }
   };
 
-  // Mouse long press for desktop
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest(".player-controls")) return;
     if ((e.target as HTMLElement).closest(".center-play-btn")) return;
-
     longPressTimer.current = window.setTimeout(() => {
       if (!playerRef.current) return;
       originalSpeed.current = speed;
@@ -374,7 +398,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
     }
   };
 
-  // Get quality label
   const getQualityLabel = (q: string) => {
     return QUALITIES.find(x => x.value === q)?.label || "Auto";
   };
@@ -393,13 +416,9 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
-      {/* YouTube iframe wrapper */}
       <div className="yt-wrapper absolute inset-0 w-full h-full pointer-events-none" />
-
-      {/* Clickable overlay */}
       <div className="absolute inset-0 z-10" />
 
-      {/* Long press 2x indicator */}
       {longPressActive && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-black/70 backdrop-blur-sm rounded-full px-4 py-1.5 flex items-center gap-2">
           <FastForward className="w-4 h-4 text-white" />
@@ -407,7 +426,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         </div>
       )}
 
-      {/* Double-tap skip indicator */}
       {skipIndicator && (
         <div
           key={skipIndicator.key}
@@ -426,7 +444,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         </div>
       )}
 
-      {/* Center play/pause button */}
       {ready && showControls && (
         <div className="center-play-btn absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
           <button
@@ -460,7 +477,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         </div>
       )}
 
-      {/* Bottom controls */}
       <div
         className={`player-controls absolute bottom-0 left-0 right-0 z-30 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -470,7 +486,6 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
       >
-        {/* Progress bar */}
         <div className="px-3 pt-2">
           <Slider
             min={0}
@@ -553,6 +568,8 @@ const YouTubePlayer = ({ url }: YouTubePlayerProps) => {
       </div>
     </div>
   );
-};
+});
+
+YouTubePlayer.displayName = "YouTubePlayer";
 
 export default YouTubePlayer;
