@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMembership } from "@/hooks/useMembership";
 import YouTubePlayer, { YouTubePlayerHandle } from "@/components/YouTubePlayer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Tag, Play, SkipForward, X } from "lucide-react";
+import { ArrowLeft, Calendar, Tag, Play } from "lucide-react";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import {
   cleanupOldEntries,
   formatSecondsToTime,
 } from "@/hooks/useWatchProgress";
+
 
 const getYoutubeId = (url: string): string => {
   const match = url.match(/(?:live\/|v=|youtu\.be\/)([^?&]+)/);
@@ -39,11 +40,6 @@ const Watch = () => {
   const [resumePrompt, setResumePrompt] = useState<number | null>(null);
   const lastSaveRef = useRef(0);
 
-  // Autoplay next
-  const [showAutoplay, setShowAutoplay] = useState(false);
-  const [countdown, setCountdown] = useState(5);
-  const [nextReplay, setNextReplay] = useState<Replay | null>(null);
-  const countdownRef = useRef<number | null>(null);
 
   // Cleanup old entries on mount
   useEffect(() => {
@@ -180,51 +176,14 @@ const Watch = () => {
     }
   }, [replay]);
 
-  // Fetch next replay for autoplay
-  useEffect(() => {
-    if (!replay) return;
-    const fetchNext = async () => {
-      const { data } = await supabase
-        .from("replays")
-        .select("*")
-        .lt("show_time", replay.show_time)
-        .order("show_time", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      setNextReplay(data ?? null);
-    };
-    fetchNext();
-  }, [replay]);
 
   // Handle video ended
   const handleEnded = useCallback(() => {
     if (!replay) return;
     const videoId = getYoutubeId(replay.youtube_url);
     clearProgress(videoId);
+  }, [replay]);
 
-    if (nextReplay) {
-      setShowAutoplay(true);
-      setCountdown(5);
-    }
-  }, [replay, nextReplay]);
-
-  // Countdown for autoplay
-  useEffect(() => {
-    if (!showAutoplay) return;
-    countdownRef.current = window.setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 1) {
-          clearInterval(countdownRef.current!);
-          navigate(`/watch/${nextReplay!.id}`, { replace: true });
-          return 0;
-        }
-        return c - 1;
-      });
-    }, 1000);
-    return () => {
-      if (countdownRef.current) clearInterval(countdownRef.current);
-    };
-  }, [showAutoplay, nextReplay, navigate]);
 
   const handleResume = () => {
     if (resumePrompt && playerRef.current) {
@@ -240,10 +199,6 @@ const Watch = () => {
     setResumePrompt(null);
   };
 
-  const cancelAutoplay = () => {
-    setShowAutoplay(false);
-    if (countdownRef.current) clearInterval(countdownRef.current);
-  };
 
   if (loading || authLoading || checking) {
     return (
@@ -312,34 +267,6 @@ const Watch = () => {
             </div>
           )}
 
-          {/* Autoplay next overlay */}
-          {showAutoplay && nextReplay && (
-            <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm rounded-lg">
-              <div className="bg-card border border-border rounded-xl p-6 shadow-2xl max-w-sm mx-4 text-center space-y-4">
-                <p className="text-muted-foreground text-sm">Berikutnya dalam</p>
-                <div className="text-4xl font-bold text-primary">{countdown}</div>
-                <p className="text-foreground font-medium text-sm truncate">
-                  {nextReplay.title}
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      cancelAutoplay();
-                      navigate(`/watch/${nextReplay.id}`, { replace: true });
-                    }}
-                  >
-                    <SkipForward className="w-4 h-4 mr-1" />
-                    Putar Sekarang
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={cancelAutoplay}>
-                    <X className="w-4 h-4 mr-1" />
-                    Batal
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="mt-6">
             <h1 className="text-2xl font-display font-bold text-foreground mb-3">

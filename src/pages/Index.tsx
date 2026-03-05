@@ -1,9 +1,16 @@
+import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import Home from "./Home";
+import SplashScreen from "@/components/SplashScreen";
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashFinish = useCallback(() => {
+    setShowSplash(false);
+  }, []);
 
   if (loading) {
     return (
@@ -17,7 +24,12 @@ const Index = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  return <Home />;
+  return (
+    <>
+      {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
+      <Home />
+    </>
+  );
 };
 
 export default Index;
