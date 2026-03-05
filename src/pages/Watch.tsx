@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -201,11 +202,7 @@ const Watch = () => {
 
 
   if (loading || authLoading || checking) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!replay) {

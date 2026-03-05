@@ -1,7 +1,18 @@
 import { useState, useEffect } from "react";
 import { Play } from "lucide-react";
 
-const TOTAL_DURATION = 5000; // 5s total
+const SPLASH_KEY = "hub_replay_last_visit";
+const SPLASH_INTERVAL = 10 * 60 * 1000; // 10 minutes
+
+export const shouldShowSplash = (): boolean => {
+  const last = localStorage.getItem(SPLASH_KEY);
+  if (!last) return true;
+  return Date.now() - parseInt(last, 10) > SPLASH_INTERVAL;
+};
+
+export const markSplashShown = () => {
+  localStorage.setItem(SPLASH_KEY, Date.now().toString());
+};
 
 const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
   const [phase, setPhase] = useState<"rotate" | "text" | "glow" | "fadeout">("rotate");
@@ -11,7 +22,6 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
     const timers: number[] = [];
     let t = 0;
 
-    // 4 rotation steps with ~1s pause each
     const steps = [
       { delay: 400, rot: 90 },
       { delay: 1000, rot: 180 },
@@ -38,7 +48,10 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
     // Finish at ~5s
     t += 500;
-    timers.push(window.setTimeout(() => onFinish(), t));
+    timers.push(window.setTimeout(() => {
+      markSplashShown();
+      onFinish();
+    }, t));
 
     return () => timers.forEach(clearTimeout);
   }, [onFinish]);
@@ -82,16 +95,18 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
             <span className="text-gradient">Replay</span>
             {showGlow && (
               <span
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: "linear-gradient(180deg, transparent 0%, hsl(0 0% 100% / 0.4) 50%, transparent 100%)",
-                  backgroundSize: "100% 200%",
-                  animation: "glowSweep 0.8s ease-out forwards",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  mixBlendMode: "overlay",
-                }}
-              />
+                className="absolute inset-0 pointer-events-none overflow-hidden"
+                aria-hidden="true"
+              >
+                <span
+                  className="block w-full"
+                  style={{
+                    height: "200%",
+                    background: "linear-gradient(180deg, transparent 0%, hsl(0 0% 100% / 0.6) 40%, hsl(0 0% 100% / 0.8) 50%, hsl(0 0% 100% / 0.6) 60%, transparent 100%)",
+                    animation: "glowSweep 0.8s ease-out forwards",
+                  }}
+                />
+              </span>
             )}
           </span>
         </div>
@@ -99,9 +114,8 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
 
       <style>{`
         @keyframes glowSweep {
-          0% { opacity: 0; transform: translateY(-100%); }
-          30% { opacity: 1; }
-          100% { opacity: 0; transform: translateY(100%); }
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(50%); }
         }
       `}</style>
     </div>
