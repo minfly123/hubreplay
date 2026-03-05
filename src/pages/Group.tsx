@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlaylists, useUserPlaylists, Playlist } from "@/hooks/usePlaylists";
@@ -137,7 +138,7 @@ const Group = () => {
           <p className="text-muted-foreground text-sm mb-6">Playlist yang sudah kamu tambahkan</p>
 
           {userPlaylistsLoading ? (
-            <div className="flex justify-center py-20"><div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" /></div>
+            <div className="flex justify-center py-20"><LoadingSpinner fullScreen={false} /></div>
           ) : userPlaylists.length === 0 ? (
             <div className="text-center py-20 text-muted-foreground">
               <ListVideo className="w-12 h-12 mx-auto mb-3 opacity-40" />
@@ -251,7 +252,7 @@ const Group = () => {
         )}
 
         {playlistsLoading ? (
-          <div className="flex justify-center py-20"><div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" /></div>
+          <div className="flex justify-center py-20"><LoadingSpinner fullScreen={false} /></div>
         ) : playlists.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
             <ListVideo className="w-12 h-12 mx-auto mb-3 opacity-40" />
