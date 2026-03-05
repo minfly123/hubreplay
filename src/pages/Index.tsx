@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import Home from "./Home";
 import SplashScreen from "@/components/SplashScreen";
+import { Play } from "lucide-react";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -15,7 +16,9 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <div className="w-12 h-12 rounded-lg gradient-primary flex items-center justify-center animate-spin" style={{ animationDuration: "1.2s" }}>
+          <Play className="w-6 h-6 text-primary-foreground" />
+        </div>
       </div>
     );
   }
