@@ -16,9 +16,10 @@ import RoleAdmin from "./pages/RoleAdmin";
 import RoleActivate from "./pages/RoleActivate";
 import ReplayInfo from "./pages/ReplayInfo";
 import ReplayUnlock from "./pages/ReplayUnlock";
-import Store from "./pages/Store";
-import Reseller from "./pages/Reseller";
+import Gift from "./pages/Gift";
+import GiftClaim from "./pages/GiftClaim";
 import NotFound from "./pages/NotFound";
+import Watermark from "@/components/Watermark";
 
 const queryClient = new QueryClient();
 
