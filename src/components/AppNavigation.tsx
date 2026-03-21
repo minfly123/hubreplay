@@ -88,6 +88,10 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                       <KeyRound className="w-4 h-4" />
                       Info Replay
                     </button>
+                    <button onClick={() => go("/gift/admin")} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+                      <Gift className="w-4 h-4" />
+                      Gift
+                    </button>
                     <button
                       onClick={() => goAdmin("/role/admin", true)}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
