@@ -47,6 +47,7 @@ const App = () => (
             <Route path="/gift/:token" element={<GiftClaim />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Watermark />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
