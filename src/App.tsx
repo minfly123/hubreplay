@@ -16,9 +16,10 @@ import RoleAdmin from "./pages/RoleAdmin";
 import RoleActivate from "./pages/RoleActivate";
 import ReplayInfo from "./pages/ReplayInfo";
 import ReplayUnlock from "./pages/ReplayUnlock";
-import Store from "./pages/Store";
-import Reseller from "./pages/Reseller";
+import Gift from "./pages/Gift";
+import GiftClaim from "./pages/GiftClaim";
 import NotFound from "./pages/NotFound";
+import Watermark from "@/components/Watermark";
 
 const queryClient = new QueryClient();
 
@@ -42,10 +43,11 @@ const App = () => (
             <Route path="/role/:token" element={<RoleActivate />} />
             <Route path="/replay-info" element={<ReplayInfo />} />
             <Route path="/unlock/:token" element={<ReplayUnlock />} />
-            <Route path="/store" element={<Store />} />
-            <Route path="/reseller" element={<Reseller />} />
+            <Route path="/gift/admin" element={<Gift />} />
+            <Route path="/gift/:token" element={<GiftClaim />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Watermark />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

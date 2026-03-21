@@ -32,6 +32,73 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_claims: {
+        Row: {
+          claimed_at: string
+          gift_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          gift_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          gift_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_claims_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "gifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gifts: {
+        Row: {
+          claimed_count: number
+          created_at: string
+          created_by: string
+          id: string
+          max_winners: number
+          replay_id: string
+          token: string
+        }
+        Insert: {
+          claimed_count?: number
+          created_at?: string
+          created_by: string
+          id?: string
+          max_winners?: number
+          replay_id: string
+          token?: string
+        }
+        Update: {
+          claimed_count?: number
+          created_at?: string
+          created_by?: string
+          id?: string
+          max_winners?: number
+          replay_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gifts_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           activated_at: string | null
