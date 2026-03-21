@@ -43,8 +43,8 @@ const App = () => (
             <Route path="/role/:token" element={<RoleActivate />} />
             <Route path="/replay-info" element={<ReplayInfo />} />
             <Route path="/unlock/:token" element={<ReplayUnlock />} />
-            <Route path="/store" element={<Store />} />
-            <Route path="/reseller" element={<Reseller />} />
+            <Route path="/gift/admin" element={<Gift />} />
+            <Route path="/gift/:token" element={<GiftClaim />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
