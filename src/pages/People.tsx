@@ -136,12 +136,12 @@ const People = () => {
             <div key={p.id} className="glass-card p-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs text-muted-foreground w-8 shrink-0">{i + 1}.</span>
-                <div className="min-w-0">
-                  <p className="text-foreground text-sm font-medium truncate">{p.email || "No email"}</p>
-                  <p className="text-muted-foreground text-xs">
-                    Bergabung: {new Date(p.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                  </p>
-                </div>
+  <div className="min-w-0">
+                    <p className="text-foreground text-sm font-medium truncate">{p.email || "No email"}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {p.username ? `@${p.username}` : "Belum ada username"} · Bergabung: {new Date(p.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {isSuperAdmin ? (
