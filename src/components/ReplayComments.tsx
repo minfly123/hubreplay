@@ -86,6 +86,10 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
       toast.error("Komentar maksimal 500 karakter");
       return;
     }
+    if (containsProfanity(trimmed)) {
+      toast.error("Komentar mengandung kata-kata tidak pantas!");
+      return;
+    }
 
     setSending(true);
     const { error } = await supabase.from("comments").insert({

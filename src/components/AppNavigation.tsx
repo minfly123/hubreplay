@@ -78,6 +78,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   <UserCircle className="w-4 h-4" />
                   Profil
                 </button>
+                <button
+                  onClick={() => go("/ai")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/ai") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Hr-Ai
+                </button>
 
                 {isAdmin && (
                   <>
