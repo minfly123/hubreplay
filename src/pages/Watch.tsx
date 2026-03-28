@@ -271,7 +271,7 @@ const Watch = () => {
             <h1 className="text-2xl font-display font-bold text-foreground mb-3">
               {replay.title}
             </h1>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
               <span className="flex items-center gap-1">
                 <Tag className="w-4 h-4" />
                 {replay.type}
@@ -281,7 +281,11 @@ const Watch = () => {
                 {format(new Date(replay.show_time), "d MMMM yyyy", { locale: idLocale })}
               </span>
             </div>
+
+            <ReplayRating replayId={replay.id} />
           </div>
+
+          <ReplayComments replayId={replay.id} />
         </div>
       </main>
     </div>

@@ -46,6 +46,7 @@ const App = () => (
             <Route path="/unlock/:token" element={<ReplayUnlock />} />
             <Route path="/gift/admin" element={<Gift />} />
             <Route path="/gift/:token" element={<GiftClaim />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Watermark />

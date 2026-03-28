@@ -71,6 +71,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   <ListVideo className="w-4 h-4" />
                   Group
                 </button>
+                <button
+                  onClick={() => go("/profile")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/profile") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <UserCircle className="w-4 h-4" />
+                  Profil
+                </button>
 
                 {isAdmin && (
                   <>
