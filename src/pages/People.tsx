@@ -18,6 +18,7 @@ interface ProfileWithRole {
   id: string;
   user_id: string;
   email: string | null;
+  username: string | null;
   created_at: string;
   role: string;
 }
