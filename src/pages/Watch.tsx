@@ -18,6 +18,8 @@ import {
   cleanupOldEntries,
   formatSecondsToTime,
 } from "@/hooks/useWatchProgress";
+import ReplayComments from "@/components/ReplayComments";
+import ReplayRating from "@/components/ReplayRating";
 
 
 const getYoutubeId = (url: string): string => {
