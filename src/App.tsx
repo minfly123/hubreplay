@@ -19,6 +19,7 @@ import ReplayUnlock from "./pages/ReplayUnlock";
 import Gift from "./pages/Gift";
 import GiftClaim from "./pages/GiftClaim";
 import Profile from "./pages/Profile";
+import AiAssistant from "./pages/AiAssistant";
 import NotFound from "./pages/NotFound";
 import Watermark from "@/components/Watermark";
 
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/gift/admin" element={<Gift />} />
             <Route path="/gift/:token" element={<GiftClaim />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/ai" element={<AiAssistant />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Watermark />
