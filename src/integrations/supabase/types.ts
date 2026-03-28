@@ -32,6 +32,41 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          replay_id: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          replay_id: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          replay_id?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gift_claims: {
         Row: {
           claimed_at: string
@@ -204,20 +239,58 @@ export type Database = {
           email: string | null
           id: string
           user_id: string
+          username: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           id?: string
           user_id: string
+          username?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           id?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
+      }
+      ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          replay_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          replay_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          replay_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       replay_unlock_tokens: {
         Row: {
