@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, MessageCircle, User } from "lucide-react";
 import { toast } from "sonner";
+import { containsProfanity, censorText } from "@/lib/profanityFilter";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
