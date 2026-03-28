@@ -18,6 +18,7 @@ import ReplayInfo from "./pages/ReplayInfo";
 import ReplayUnlock from "./pages/ReplayUnlock";
 import Gift from "./pages/Gift";
 import GiftClaim from "./pages/GiftClaim";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Watermark from "@/components/Watermark";
 
