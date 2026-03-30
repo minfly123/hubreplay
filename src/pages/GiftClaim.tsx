@@ -80,25 +80,24 @@ const GiftClaim = () => {
     if (!giftInfo || !user) return;
     setClaiming(true);
 
-    // Insert claim
+    // Atomic increment - prevents race condition
+    const { data: slotClaimed, error: rpcError } = await supabase
+      .rpc("claim_gift", { _gift_id: giftInfo.id, _user_id: user.id });
+
+    if (rpcError || !slotClaimed) {
+      toast.error("Slot sudah habis atau gagal klaim!");
+      setClaiming(false);
+      setStatus("full");
+      return;
+    }
+
+    // Insert claim record
     const { error: claimError } = await supabase
       .from("gift_claims")
       .insert({ gift_id: giftInfo.id, user_id: user.id });
 
     if (claimError) {
       toast.error("Gagal klaim gift!");
-      setClaiming(false);
-      return;
-    }
-
-    // Increment claimed_count
-    const { error: updateError } = await supabase
-      .from("gifts")
-      .update({ claimed_count: giftInfo.claimed_count + 1 })
-      .eq("id", giftInfo.id);
-
-    if (updateError) {
-      toast.error("Gagal update slot!");
       setClaiming(false);
       return;
     }
