@@ -25,7 +25,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       setTitle(editReplay.title);
       setYoutubeUrl(editReplay.youtube_url);
       setType(editReplay.type);
-      setShowTime(editReplay.show_time.slice(0, 10));
+      setShowTime(new Date(editReplay.show_time).toISOString().slice(0, 10));
       setIsFree((editReplay as any).is_free ?? false);
     }
   }, [editReplay]);
@@ -38,7 +38,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       title: title.trim(),
       youtube_url: youtubeUrl.trim(),
       type: type.trim(),
-      show_time: new Date(showTime + "T00:00:00").toISOString(),
+      show_time: showTime + "T00:00:00Z",
       is_free: isFree,
     };
 
