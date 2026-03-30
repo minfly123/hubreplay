@@ -62,7 +62,7 @@ const ReplayCard = ({ replay, isUnlocked, onWatch }: ReplayCardProps) => {
           </span>
           <span className="flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5" />
-            {format(new Date(replay.show_time), "d MMMM yyyy", { locale: id })}
+            {format(new Date(replay.show_time + (replay.show_time.endsWith("Z") ? "" : "")), "d MMMM yyyy", { locale: id })}
           </span>
         </div>
       </div>
