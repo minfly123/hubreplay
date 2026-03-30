@@ -38,7 +38,7 @@ const AdminReplayForm = ({ editReplay, onDone }: AdminReplayFormProps) => {
       title: title.trim(),
       youtube_url: youtubeUrl.trim(),
       type: type.trim(),
-      show_time: new Date(showTime + "T00:00:00").toISOString(),
+      show_time: showTime + "T00:00:00Z",
       is_free: isFree,
     };
 
