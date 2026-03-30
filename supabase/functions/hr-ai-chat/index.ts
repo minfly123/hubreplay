@@ -24,7 +24,13 @@ Fitur Hub Replay:
 - Replay bisa dibuka dengan URL kunci dari admin, membership, gift, atau playlist
 - Pengguna bisa memberikan rating dan komentar di setiap replay
 - Fitur Auto-Resume untuk melanjutkan tontonan dari posisi terakhir
-- Harga replay mulai dari Rp2.000 per show
+- Harga dan paket:
+  🎟 1 Replay — Rp2.000
+  👑 Membership 1 Minggu — Rp7.000
+  👑 Membership 1 Bulan — Rp10.000
+  👑 Membership Permanen — Rp20.000
+- Pembayaran via Dana / GoPay
+- Untuk pembelian dan info, hubungi langsung via WhatsApp: wa.me/+62895351456586
 - Fitur profil pengguna dengan username unik
 - Filter kata-kata tidak pantas di komentar
 - Watermark untuk perlindungan konten
