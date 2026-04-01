@@ -51,7 +51,7 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
       .then(({ data }) => setUsername(data?.username ?? null));
   }, [user]);
 
-  // Fetch comments
+  // Fetch comments & user roles
   useEffect(() => {
     const fetchComments = async () => {
       const { data } = await supabase
@@ -59,7 +59,27 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
         .select("*")
         .eq("replay_id", replayId)
         .order("created_at", { ascending: true });
-      if (data) setComments(data);
+      if (data) {
+        setComments(data);
+        // Fetch roles for all unique user_ids in comments
+        const userIds = [...new Set(data.map((c) => c.user_id))];
+        if (userIds.length > 0) {
+          const { data: roles } = await supabase
+            .from("user_roles")
+            .select("user_id, role")
+            .in("user_id", userIds);
+          if (roles) {
+            const roleMap: Record<string, string> = {};
+            roles.forEach((r) => {
+              // Keep highest role per user
+              if (!roleMap[r.user_id] || r.role === "super_admin" || (r.role === "admin" && roleMap[r.user_id] !== "super_admin")) {
+                roleMap[r.user_id] = r.role;
+              }
+            });
+            setUserRoles(roleMap);
+          }
+        }
+      }
     };
     fetchComments();
 
