@@ -35,6 +35,9 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
   const [username, setUsername] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Auto-refresh relative timestamps
+  useRelativeTime(comments.map((c) => c.created_at));
+
   // Fetch username
   useEffect(() => {
     if (!user) return;

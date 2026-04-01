@@ -20,6 +20,7 @@ import {
 } from "@/hooks/useWatchProgress";
 import ReplayComments from "@/components/ReplayComments";
 import ReplayRating from "@/components/ReplayRating";
+import ReplayViewCount from "@/components/ReplayViewCount";
 
 
 const getYoutubeId = (url: string): string => {
