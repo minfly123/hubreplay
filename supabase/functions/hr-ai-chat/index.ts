@@ -87,9 +87,33 @@ serve(async (req) => {
 
     const { data: replays } = await supabase
       .from("replays")
-      .select("title, type, show_time, is_free")
+      .select("id, title, type, show_time, is_free")
       .order("show_time", { ascending: false })
       .limit(100);
+
+    // Fetch views count per replay
+    const { data: viewsData } = await supabase
+      .from("replay_views")
+      .select("replay_id");
+
+    // Fetch ratings per replay
+    const { data: ratingsData } = await supabase
+      .from("ratings")
+      .select("replay_id, rating");
+
+    // Aggregate views
+    const viewsMap: Record<string, number> = {};
+    (viewsData || []).forEach((v: any) => {
+      viewsMap[v.replay_id] = (viewsMap[v.replay_id] || 0) + 1;
+    });
+
+    // Aggregate ratings
+    const ratingsMap: Record<string, { sum: number; count: number }> = {};
+    (ratingsData || []).forEach((r: any) => {
+      if (!ratingsMap[r.replay_id]) ratingsMap[r.replay_id] = { sum: 0, count: 0 };
+      ratingsMap[r.replay_id].sum += r.rating;
+      ratingsMap[r.replay_id].count += 1;
+    });
 
     const replayList = replays && replays.length > 0
       ? replays.map((r: any, i: number) => {
@@ -100,12 +124,28 @@ serve(async (req) => {
         }).join("\n")
       : "Belum ada replay yang tersedia.";
 
+    // Build popularity data
+    const popularityList = replays && replays.length > 0
+      ? replays
+          .map((r: any) => {
+            const views = viewsMap[r.id] || 0;
+            const rData = ratingsMap[r.id];
+            const avgRating = rData ? Math.round((rData.sum / rData.count) * 10) / 10 : 0;
+            const totalRatings = rData ? rData.count : 0;
+            return { title: r.title, views, avgRating, totalRatings };
+          })
+          .sort((a: any, b: any) => b.views - a.views)
+          .map((r: any, i: number) => `${i + 1}. "${r.title}" - ${r.views} penonton - Rating: ${r.avgRating > 0 ? r.avgRating + "/5 (" + r.totalRatings + " rating)" : "Belum ada rating"}`)
+          .join("\n")
+      : "Belum ada data.";
+
     const today = new Date().toLocaleDateString("id-ID", {
       weekday: "long", year: "numeric", month: "long", day: "numeric",
     });
 
     const systemPrompt = BASE_SYSTEM_PROMPT
       .replace("{{REPLAY_DATA}}", replayList)
+      .replace("{{POPULARITY_DATA}}", popularityList)
       .replace("{{TODAY_DATE}}", today);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
