@@ -34,6 +34,7 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
   const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [userRoles, setUserRoles] = useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-refresh relative timestamps
