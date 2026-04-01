@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, MessageCircle, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Send, MessageCircle, User, Crown, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { containsProfanity, censorText } from "@/lib/profanityFilter";
 import { formatDistanceToNow } from "date-fns";
@@ -33,6 +34,7 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
   const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [userRoles, setUserRoles] = useState<Record<string, string>>({});
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-refresh relative timestamps
@@ -49,7 +51,7 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
       .then(({ data }) => setUsername(data?.username ?? null));
   }, [user]);
 
-  // Fetch comments
+  // Fetch comments & user roles
   useEffect(() => {
     const fetchComments = async () => {
       const { data } = await supabase
@@ -57,7 +59,27 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
         .select("*")
         .eq("replay_id", replayId)
         .order("created_at", { ascending: true });
-      if (data) setComments(data);
+      if (data) {
+        setComments(data);
+        // Fetch roles for all unique user_ids in comments
+        const userIds = [...new Set(data.map((c) => c.user_id))];
+        if (userIds.length > 0) {
+          const { data: roles } = await supabase
+            .from("user_roles")
+            .select("user_id, role")
+            .in("user_id", userIds);
+          if (roles) {
+            const roleMap: Record<string, string> = {};
+            roles.forEach((r) => {
+              // Keep highest role per user
+              if (!roleMap[r.user_id] || r.role === "super_admin" || (r.role === "admin" && roleMap[r.user_id] !== "super_admin")) {
+                roleMap[r.user_id] = r.role;
+              }
+            });
+            setUserRoles(roleMap);
+          }
+        }
+      }
     };
     fetchComments();
 
@@ -137,8 +159,16 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
             key={c.id}
             className={`flex gap-3 animate-fade-in ${c.user_id === user?.id ? "flex-row-reverse" : ""}`}
           >
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-primary" />
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+              userRoles[c.user_id] === "super_admin" ? "bg-amber-500/20" : userRoles[c.user_id] === "admin" ? "bg-blue-500/20" : "bg-primary/20"
+            }`}>
+              {userRoles[c.user_id] === "super_admin" ? (
+                <Crown className="w-4 h-4 text-amber-500" />
+              ) : userRoles[c.user_id] === "admin" ? (
+                <Shield className="w-4 h-4 text-blue-500" />
+              ) : (
+                <User className="w-4 h-4 text-primary" />
+              )}
             </div>
             <div
               className={`max-w-[75%] rounded-xl px-3.5 py-2.5 ${
@@ -147,8 +177,18 @@ const ReplayComments = ({ replayId }: { replayId: string }) => {
                   : "bg-secondary/60 border border-border"
               }`}
             >
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-xs font-semibold text-primary">@{c.username}</span>
+                {userRoles[c.user_id] === "super_admin" && (
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-amber-500/50 text-amber-500 bg-amber-500/10">
+                    <Crown className="w-2.5 h-2.5 mr-0.5" /> Owner
+                  </Badge>
+                )}
+                {userRoles[c.user_id] === "admin" && (
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-blue-500/50 text-blue-500 bg-blue-500/10">
+                    <Shield className="w-2.5 h-2.5 mr-0.5" /> Reseller
+                  </Badge>
+                )}
                 <span className="text-[10px] text-muted-foreground">
                   {formatDistanceToNow(new Date(c.created_at), { addSuffix: true, locale: idLocale })}
                 </span>
