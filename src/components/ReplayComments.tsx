@@ -9,6 +9,15 @@ import { containsProfanity, censorText } from "@/lib/profanityFilter";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
+const useRelativeTime = (dates: string[], intervalMs = 15000) => {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (dates.length === 0) return;
+    const id = setInterval(() => setTick((t) => t + 1), intervalMs);
+    return () => clearInterval(id);
+  }, [dates.length, intervalMs]);
+};
+
 interface Comment {
   id: string;
   replay_id: string;
