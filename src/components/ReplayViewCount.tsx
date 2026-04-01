@@ -7,9 +7,12 @@ const ReplayViewCount = ({ replayId }: { replayId: string }) => {
   const { user } = useAuth();
   const [count, setCount] = useState(0);
 
-  // Record view (upsert - only once per user per replay)
+  const viewRecorded = useRef(false);
+
+  // Record view (only once per session per replay)
   useEffect(() => {
-    if (!user) return;
+    if (!user || viewRecorded.current) return;
+    viewRecorded.current = true;
     supabase
       .from("replay_views")
       .upsert({ replay_id: replayId, user_id: user.id }, { onConflict: "replay_id,user_id" })
