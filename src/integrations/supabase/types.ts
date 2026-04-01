@@ -372,6 +372,32 @@ export type Database = {
           },
         ]
       }
+      replay_views: {
+        Row: {
+          replay_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          replay_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          replay_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replay_views_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: false
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       replays: {
         Row: {
           created_at: string
