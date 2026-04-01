@@ -284,6 +284,7 @@ const Watch = () => {
             </div>
 
             <ReplayRating replayId={replay.id} />
+            <ReplayViewCount replayId={replay.id} />
           </div>
 
           <ReplayComments replayId={replay.id} />
