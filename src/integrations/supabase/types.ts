@@ -32,6 +32,33 @@ export type Database = {
         }
         Relationships: []
       }
+      coin_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -133,6 +160,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lottery_results: {
+        Row: {
+          claimed: boolean
+          created_at: string
+          id: string
+          prize_key: string
+          prize_name: string
+          user_id: string
+        }
+        Insert: {
+          claimed?: boolean
+          created_at?: string
+          id?: string
+          prize_key: string
+          prize_name: string
+          user_id: string
+        }
+        Update: {
+          claimed?: boolean
+          created_at?: string
+          id?: string
+          prize_key?: string
+          prize_name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       memberships: {
         Row: {
@@ -464,6 +518,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_coins: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_playlists: {
         Row: {
           added_at: string
@@ -519,6 +597,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_coins: {
+        Args: { _amount: number; _user_id: string }
+        Returns: undefined
+      }
       claim_gift: {
         Args: { _gift_id: string; _user_id: string }
         Returns: boolean
@@ -532,6 +614,10 @@ export type Database = {
       }
       is_at_least_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      spend_coins: {
+        Args: { _amount: number; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "super_admin"
