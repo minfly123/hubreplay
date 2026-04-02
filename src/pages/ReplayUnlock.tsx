@@ -76,6 +76,15 @@ const ReplayUnlock = () => {
         token_id: tokenData.id,
       }, { onConflict: "replay_id,user_id" });
 
+    // 4. Grant 200 bonus coins for replay unlock
+    await supabase.rpc("add_coins", { _user_id: user.id, _amount: 200 });
+    await supabase.from("coin_transactions").insert({
+      user_id: user.id,
+      amount: 200,
+      type: "replay_unlock_bonus",
+      description: "Bonus 200 koin dari aktivasi replay",
+    });
+
     setStatus("done");
 
     // Redirect to watch after short delay
