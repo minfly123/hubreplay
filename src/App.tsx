@@ -50,6 +50,7 @@ const App = () => (
             <Route path="/gift/:token" element={<GiftClaim />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/ai" element={<AiAssistant />} />
+            <Route path="/lottery" element={<Lottery />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Watermark />
