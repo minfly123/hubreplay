@@ -20,6 +20,7 @@ import Gift from "./pages/Gift";
 import GiftClaim from "./pages/GiftClaim";
 import Profile from "./pages/Profile";
 import AiAssistant from "./pages/AiAssistant";
+import Lottery from "./pages/Lottery";
 import NotFound from "./pages/NotFound";
 import Watermark from "@/components/Watermark";
 
