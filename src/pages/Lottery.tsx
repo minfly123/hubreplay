@@ -20,10 +20,10 @@ interface Prize {
 }
 
 const PRIZES: Prize[] = [
-  { key: "coins_50", name: "50 Koin Gratis", weight: 90, type: "coins", coinAmount: 50 },
+  { key: "coins_50", name: "50 Koin Gratis", weight: 40, type: "coins", coinAmount: 50 },
   { key: "photobook_pumpkin", name: "PDF Digital Photobook Oh My Pumpkin", weight: 25, type: "photobook", waTemplate: "Halo Admin, saya mendapat hadiah 'PDF Digital Photobook Oh My Pumpkin' dari undian Hub Replay. Berikut bukti hadiah saya:" },
   { key: "pm_jkt48", name: "PM Member JKT48 All Member Permanen (via Telegram)", weight: 20, type: "telegram", telegramLink: "https://t.me/addlist/06SXr_6fklg5NjU1" },
-  { key: "photobook_idola", name: "PDF Digital Photobook Andai Ku Bukan Idola", weight: 15, type: "photobook", waTemplate: "Halo Admin, saya mendapat hadiah 'PDF Digital Photobook Andai Ku Bukan Idola' dari undian Hub Replay. Berikut bukti hadiah saya:" },
+  { key: "photobook_idola", name: "PDF Digital Photobook Andai Ku Bukan Idola", weight: 14, type: "photobook", waTemplate: "Halo Admin, saya mendapat hadiah 'PDF Digital Photobook Andai Ku Bukan Idola' dari undian Hub Replay. Berikut bukti hadiah saya:" },
   { key: "coins_1000", name: "1000 Koin Jackpot!", weight: 1, type: "coins", coinAmount: 1000 },
 ];
 
