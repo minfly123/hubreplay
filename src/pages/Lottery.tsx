@@ -257,8 +257,12 @@ const Lottery = () => {
     link.click();
   };
 
-  if (authLoading || loadingData) return <LoadingSpinner />;
-  if (!user) return <LoadingSpinner />;
+  if (authLoading) return <LoadingSpinner />;
+  if (!user) {
+    window.location.href = "/auth";
+    return <LoadingSpinner />;
+  }
+  if (loadingData) return <LoadingSpinner />;
 
   if (!open) {
     return (
