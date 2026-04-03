@@ -71,11 +71,20 @@ const Lottery = () => {
 
   // Check operating hours every minute
   useEffect(() => {
-    const check = () => setOpen(isOperatingHours());
+    const check = async () => {
+      // Fetch fresh server time for operating hours
+      try {
+        const resp = await supabase.functions.invoke("server-time");
+        const sTime = resp.data?.serverTime || null;
+        setOpen(isOperatingHours(sTime));
+      } catch {
+        setOpen(isOperatingHours(serverTime));
+      }
+    };
     check();
     const iv = setInterval(check, 30000);
     return () => clearInterval(iv);
-  }, []);
+  }, [serverTime]);
 
   const loadData = useCallback(async () => {
     if (!user) return;
