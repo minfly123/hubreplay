@@ -55,6 +55,7 @@ const isOperatingHours = (serverTimeMs?: number | null) => {
 
 const Lottery = () => {
   const { user, loading: authLoading } = useAuth();
+  const { serverTime } = useTimeValidation();
   const [coins, setCoins] = useState(0);
   const [tickets, setTickets] = useState(0);
   const [buyAmount, setBuyAmount] = useState("");
@@ -63,7 +64,7 @@ const Lottery = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [hasFreeSpin, setHasFreeSpin] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [open, setOpen] = useState(isOperatingHours());
+  const [open, setOpen] = useState(isOperatingHours(serverTime));
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showTicket, setShowTicket] = useState(false);
   const [ticketPrize, setTicketPrize] = useState<any>(null);
