@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Play, Send, Bot, User, Trash2, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, Bot, User, Trash2, Sparkles } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ interface Message {
 }
 
 const STORAGE_KEY = "hr_ai_chat_history";
+const AUDIO_URL = "https://files.catbox.moe/zt1lz1.mp3";
 
 const loadHistory = (): Message[] => {
   try {
@@ -27,6 +28,61 @@ const loadHistory = (): Message[] => {
 
 const saveHistory = (msgs: Message[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs));
+};
+
+// Detect audio tags in AI response
+const AUDIO_MARKER = "[AUDIO:";
+
+const renderMessageContent = (content: string) => {
+  // Check for audio markers like [AUDIO:url]
+  const parts: React.ReactNode[] = [];
+  let remaining = content;
+  let idx = 0;
+
+  while (remaining.includes(AUDIO_MARKER)) {
+    const start = remaining.indexOf(AUDIO_MARKER);
+    const end = remaining.indexOf("]", start);
+    if (end === -1) break;
+
+    // Text before audio
+    if (start > 0) {
+      const textBefore = remaining.substring(0, start);
+      parts.push(
+        <div key={`text-${idx}`} className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
+          <ReactMarkdown>{textBefore}</ReactMarkdown>
+        </div>
+      );
+    }
+
+    const url = remaining.substring(start + AUDIO_MARKER.length, end);
+    parts.push(
+      <div key={`audio-${idx}`} className="my-2 bg-background/50 rounded-lg p-2 border border-border">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs text-primary font-medium">🎵 Music</span>
+        </div>
+        <audio controls className="w-full h-10" preload="none">
+          <source src={url} type="audio/mpeg" />
+        </audio>
+      </div>
+    );
+
+    remaining = remaining.substring(end + 1);
+    idx++;
+  }
+
+  if (remaining.trim()) {
+    parts.push(
+      <div key={`text-end-${idx}`} className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
+        <ReactMarkdown>{remaining}</ReactMarkdown>
+      </div>
+    );
+  }
+
+  return parts.length > 0 ? <>{parts}</> : (
+    <div className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
+      <ReactMarkdown>{content}</ReactMarkdown>
+    </div>
+  );
 };
 
 const AiAssistant = () => {
@@ -63,7 +119,11 @@ const AiAssistant = () => {
       const chatHistory = newMessages.map((m) => ({ role: m.role, content: m.content }));
 
       const resp = await supabase.functions.invoke("hr-ai-chat", {
-        body: { messages: chatHistory },
+        body: { 
+          messages: chatHistory,
+          userTime: new Date().toLocaleString("id-ID", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+          userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
       });
 
       if (resp.error) throw new Error(resp.error.message);
@@ -96,7 +156,6 @@ const AiAssistant = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -119,7 +178,6 @@ const AiAssistant = () => {
         </div>
       </header>
 
-      {/* Chat area */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 max-w-3xl mx-auto w-full">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full min-h-[50vh] text-center space-y-4 animate-fade-in">
@@ -157,8 +215,8 @@ const AiAssistant = () => {
                 : "bg-secondary/60 border border-border"
             }`}>
               {msg.role === "assistant" ? (
-                <div className="text-sm text-foreground prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                <div className="text-sm text-foreground">
+                  {renderMessageContent(msg.content)}
                 </div>
               ) : (
                 <p className="text-sm text-foreground whitespace-pre-wrap">{msg.content}</p>
@@ -187,7 +245,6 @@ const AiAssistant = () => {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input area */}
       <div className="border-t border-border bg-card/50 backdrop-blur-md p-4">
         <div className="max-w-3xl mx-auto flex gap-2 items-end">
           <Textarea

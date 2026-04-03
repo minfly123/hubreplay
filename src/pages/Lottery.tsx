@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useTimeValidation } from "@/hooks/useTimeValidation";
 import AppNavigation from "@/components/AppNavigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,13 +42,20 @@ const pickPrize = (): Prize => {
   return PRIZES[0];
 };
 
-const isOperatingHours = () => {
-  const h = new Date().getHours();
-  return h >= OPERATING_START && h < OPERATING_END;
+const isOperatingHours = (serverTimeMs?: number | null) => {
+  // Use server time if available, fallback to local
+  const now = serverTimeMs ? new Date(serverTimeMs) : new Date();
+  // Convert to WIB (UTC+7)
+  const wibOffset = 7 * 60; // minutes
+  const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const wibMinutes = (utcMinutes + wibOffset) % (24 * 60);
+  const wibHour = Math.floor(wibMinutes / 60);
+  return wibHour >= OPERATING_START && wibHour < OPERATING_END;
 };
 
 const Lottery = () => {
   const { user, loading: authLoading } = useAuth();
+  const { serverTime } = useTimeValidation();
   const [coins, setCoins] = useState(0);
   const [tickets, setTickets] = useState(0);
   const [buyAmount, setBuyAmount] = useState("");
@@ -56,18 +64,27 @@ const Lottery = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [hasFreeSpin, setHasFreeSpin] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [open, setOpen] = useState(isOperatingHours());
+  const [open, setOpen] = useState(isOperatingHours(serverTime));
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showTicket, setShowTicket] = useState(false);
   const [ticketPrize, setTicketPrize] = useState<any>(null);
 
   // Check operating hours every minute
   useEffect(() => {
-    const check = () => setOpen(isOperatingHours());
+    const check = async () => {
+      // Fetch fresh server time for operating hours
+      try {
+        const resp = await supabase.functions.invoke("server-time");
+        const sTime = resp.data?.serverTime || null;
+        setOpen(isOperatingHours(sTime));
+      } catch {
+        setOpen(isOperatingHours(serverTime));
+      }
+    };
     check();
     const iv = setInterval(check, 30000);
     return () => clearInterval(iv);
-  }, []);
+  }, [serverTime]);
 
   const loadData = useCallback(async () => {
     if (!user) return;

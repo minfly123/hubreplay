@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { useTimeValidation } from "@/hooks/useTimeValidation";
+import TimeBlockScreen from "@/components/TimeBlockScreen";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Watch from "./pages/Watch";
@@ -26,6 +29,39 @@ import Watermark from "@/components/Watermark";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  const { timeValid, checking } = useTimeValidation();
+
+  if (checking) return <LoadingSpinner />;
+  if (!timeValid) return <TimeBlockScreen />;
+
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/watch/:id" element={<Watch />} />
+        <Route path="/group" element={<Group />} />
+        <Route path="/group/invite/:token" element={<GroupInvite />} />
+        <Route path="/people" element={<People />} />
+        <Route path="/membership/admin" element={<MembershipAdmin />} />
+        <Route path="/membership/:token" element={<MembershipActivate />} />
+        <Route path="/role/admin" element={<RoleAdmin />} />
+        <Route path="/role/:token" element={<RoleActivate />} />
+        <Route path="/replay-info" element={<ReplayInfo />} />
+        <Route path="/unlock/:token" element={<ReplayUnlock />} />
+        <Route path="/gift/admin" element={<Gift />} />
+        <Route path="/gift/:token" element={<GiftClaim />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/ai" element={<AiAssistant />} />
+        <Route path="/lottery" element={<Lottery />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Watermark />
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -33,27 +69,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/watch/:id" element={<Watch />} />
-            <Route path="/group" element={<Group />} />
-            <Route path="/group/invite/:token" element={<GroupInvite />} />
-            <Route path="/people" element={<People />} />
-            <Route path="/membership/admin" element={<MembershipAdmin />} />
-            <Route path="/membership/:token" element={<MembershipActivate />} />
-            <Route path="/role/admin" element={<RoleAdmin />} />
-            <Route path="/role/:token" element={<RoleActivate />} />
-            <Route path="/replay-info" element={<ReplayInfo />} />
-            <Route path="/unlock/:token" element={<ReplayUnlock />} />
-            <Route path="/gift/admin" element={<Gift />} />
-            <Route path="/gift/:token" element={<GiftClaim />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/ai" element={<AiAssistant />} />
-            <Route path="/lottery" element={<Lottery />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Watermark />
+          <AppContent />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
