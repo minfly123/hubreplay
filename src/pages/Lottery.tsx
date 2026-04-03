@@ -42,9 +42,15 @@ const pickPrize = (): Prize => {
   return PRIZES[0];
 };
 
-const isOperatingHours = () => {
-  const h = new Date().getHours();
-  return h >= OPERATING_START && h < OPERATING_END;
+const isOperatingHours = (serverTimeMs?: number | null) => {
+  // Use server time if available, fallback to local
+  const now = serverTimeMs ? new Date(serverTimeMs) : new Date();
+  // Convert to WIB (UTC+7)
+  const wibOffset = 7 * 60; // minutes
+  const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const wibMinutes = (utcMinutes + wibOffset) % (24 * 60);
+  const wibHour = Math.floor(wibMinutes / 60);
+  return wibHour >= OPERATING_START && wibHour < OPERATING_END;
 };
 
 const Lottery = () => {
