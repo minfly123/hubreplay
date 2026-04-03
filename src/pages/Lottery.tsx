@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useTimeValidation } from "@/hooks/useTimeValidation";
 import AppNavigation from "@/components/AppNavigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
