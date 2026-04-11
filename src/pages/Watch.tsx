@@ -21,7 +21,7 @@ import {
 import ReplayComments from "@/components/ReplayComments";
 import ReplayRating from "@/components/ReplayRating";
 import ReplayViewCount from "@/components/ReplayViewCount";
-
+import UsernameReminderDialog from "@/components/UsernameReminderDialog";
 
 const getYoutubeId = (url: string): string => {
   const match = url.match(/(?:live\/|v=|youtu\.be\/)([^?&]+)/);
