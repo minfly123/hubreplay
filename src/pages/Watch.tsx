@@ -40,6 +40,9 @@ const Watch = () => {
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const playerRef = useRef<YouTubePlayerHandle>(null);
 
+  // Username check
+  const [hasUsername, setHasUsername] = useState<boolean | null>(null);
+
   // Auto-resume
   const [resumePrompt, setResumePrompt] = useState<number | null>(null);
   const lastSaveRef = useRef(0);
