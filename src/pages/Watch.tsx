@@ -48,6 +48,20 @@ const Watch = () => {
   const lastSaveRef = useRef(0);
 
 
+  // Check username
+  useEffect(() => {
+    if (!user) return;
+    const check = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setHasUsername(!!data?.username);
+    };
+    check();
+  }, [user]);
+
   // Cleanup old entries on mount
   useEffect(() => {
     cleanupOldEntries();
@@ -223,6 +237,13 @@ const Watch = () => {
   if (!unlocked) return null;
 
   return (
+    <>
+      {hasUsername === false && (
+        <UsernameReminderDialog
+          open={true}
+          onSaved={() => setHasUsername(true)}
+        />
+      )}
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
