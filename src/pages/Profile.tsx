@@ -18,6 +18,9 @@ const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -126,6 +129,54 @@ const Profile = () => {
                   ⚠️ Kamu harus mengatur username untuk bisa berkomentar
                 </p>
               )}
+            </div>
+
+            {/* Change Password */}
+            <div className="space-y-2 pt-4 border-t border-border">
+              <Label className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
+                <Lock className="w-3.5 h-3.5" />
+                Ganti Password
+              </Label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Password baru"
+              />
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Konfirmasi password baru"
+              />
+              <Button
+                size="sm"
+                onClick={async () => {
+                  if (!newPassword || newPassword.length < 6) {
+                    toast.error("Password minimal 6 karakter");
+                    return;
+                  }
+                  if (newPassword !== confirmPassword) {
+                    toast.error("Password tidak cocok!");
+                    return;
+                  }
+                  setChangingPassword(true);
+                  const { error } = await supabase.auth.updateUser({ password: newPassword });
+                  if (error) {
+                    toast.error("Gagal mengubah password: " + error.message);
+                  } else {
+                    toast.success("Password berhasil diubah!");
+                    setNewPassword("");
+                    setConfirmPassword("");
+                  }
+                  setChangingPassword(false);
+                }}
+                disabled={changingPassword || !newPassword || !confirmPassword}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-1" />
+                {changingPassword ? "Menyimpan..." : "Simpan Password Baru"}
+              </Button>
             </div>
           </CardContent>
         </Card>
