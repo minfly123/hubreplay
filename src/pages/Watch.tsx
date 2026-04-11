@@ -21,7 +21,7 @@ import {
 import ReplayComments from "@/components/ReplayComments";
 import ReplayRating from "@/components/ReplayRating";
 import ReplayViewCount from "@/components/ReplayViewCount";
-
+import UsernameReminderDialog from "@/components/UsernameReminderDialog";
 
 const getYoutubeId = (url: string): string => {
   const match = url.match(/(?:live\/|v=|youtu\.be\/)([^?&]+)/);
@@ -40,10 +40,27 @@ const Watch = () => {
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const playerRef = useRef<YouTubePlayerHandle>(null);
 
+  // Username check
+  const [hasUsername, setHasUsername] = useState<boolean | null>(null);
+
   // Auto-resume
   const [resumePrompt, setResumePrompt] = useState<number | null>(null);
   const lastSaveRef = useRef(0);
 
+
+  // Check username
+  useEffect(() => {
+    if (!user) return;
+    const check = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setHasUsername(!!data?.username);
+    };
+    check();
+  }, [user]);
 
   // Cleanup old entries on mount
   useEffect(() => {
@@ -220,6 +237,13 @@ const Watch = () => {
   if (!unlocked) return null;
 
   return (
+    <>
+      {hasUsername === false && (
+        <UsernameReminderDialog
+          open={true}
+          onSaved={() => setHasUsername(true)}
+        />
+      )}
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
@@ -291,6 +315,7 @@ const Watch = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 

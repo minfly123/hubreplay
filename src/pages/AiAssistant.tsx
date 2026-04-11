@@ -15,7 +15,6 @@ interface Message {
 }
 
 const STORAGE_KEY = "hr_ai_chat_history";
-const AUDIO_URL = "https://files.catbox.moe/zt1lz1.mp3";
 
 const loadHistory = (): Message[] => {
   try {
@@ -30,55 +29,8 @@ const saveHistory = (msgs: Message[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs));
 };
 
-// Detect audio tags in AI response
-const AUDIO_MARKER = "[AUDIO:";
-
 const renderMessageContent = (content: string) => {
-  // Check for audio markers like [AUDIO:url]
-  const parts: React.ReactNode[] = [];
-  let remaining = content;
-  let idx = 0;
-
-  while (remaining.includes(AUDIO_MARKER)) {
-    const start = remaining.indexOf(AUDIO_MARKER);
-    const end = remaining.indexOf("]", start);
-    if (end === -1) break;
-
-    // Text before audio
-    if (start > 0) {
-      const textBefore = remaining.substring(0, start);
-      parts.push(
-        <div key={`text-${idx}`} className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
-          <ReactMarkdown>{textBefore}</ReactMarkdown>
-        </div>
-      );
-    }
-
-    const url = remaining.substring(start + AUDIO_MARKER.length, end);
-    parts.push(
-      <div key={`audio-${idx}`} className="my-2 bg-background/50 rounded-lg p-2 border border-border">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs text-primary font-medium">🎵 Music</span>
-        </div>
-        <audio controls className="w-full h-10" preload="none">
-          <source src={url} type="audio/mpeg" />
-        </audio>
-      </div>
-    );
-
-    remaining = remaining.substring(end + 1);
-    idx++;
-  }
-
-  if (remaining.trim()) {
-    parts.push(
-      <div key={`text-end-${idx}`} className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
-        <ReactMarkdown>{remaining}</ReactMarkdown>
-      </div>
-    );
-  }
-
-  return parts.length > 0 ? <>{parts}</> : (
+  return (
     <div className="prose prose-sm prose-invert max-w-none [&>p]:m-0 [&>ul]:mt-1 [&>ol]:mt-1">
       <ReactMarkdown>{content}</ReactMarkdown>
     </div>
