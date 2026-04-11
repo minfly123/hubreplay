@@ -108,6 +108,13 @@ const Lottery = () => {
     if (user) loadData();
   }, [user, loadData]);
 
+  // Persist tickets to localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("hr_lottery_tickets_" + user.id, String(tickets));
+    }
+  }, [tickets, user]);
+
   // Realtime coins subscription
   useEffect(() => {
     if (!user) return;
