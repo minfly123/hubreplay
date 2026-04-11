@@ -57,7 +57,12 @@ const Lottery = () => {
   const { user, loading: authLoading } = useAuth();
   const { serverTime } = useTimeValidation();
   const [coins, setCoins] = useState(0);
-  const [tickets, setTickets] = useState(0);
+  const [tickets, setTickets] = useState(() => {
+    try {
+      const saved = localStorage.getItem("hr_lottery_tickets_" + user?.id);
+      return saved ? parseInt(saved) || 0 : 0;
+    } catch { return 0; }
+  });
   const [buyAmount, setBuyAmount] = useState("");
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<Prize | null>(null);
