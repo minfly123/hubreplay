@@ -119,17 +119,9 @@ const Schedule = () => {
                 key={show.id}
                 className="overflow-hidden glass-card hover:border-primary/40 transition-colors"
               >
-                <div className="relative aspect-video bg-secondary overflow-hidden">
-                  <img
-                    src={show.banner || show.poster}
-                    alt={show.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = show.poster || "/placeholder.svg";
-                    }}
-                  />
-                  <div className="absolute top-2 right-2">
+                <ShowBanner show={show} />
+                <div className="relative">
+                  <div className="absolute -top-10 right-2 z-10">
                     <Badge className="bg-primary text-primary-foreground">{show.team}</Badge>
                   </div>
                 </div>
