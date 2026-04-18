@@ -59,6 +59,37 @@ const Countdown = ({ target }: { target: string }) => {
   );
 };
 
+const ShowBanner = ({ show }: { show: TheaterShow }) => {
+  const candidates = [
+    show.banner,
+    show.poster,
+    show.banner
+      ? `https://images.weserv.nl/?url=${encodeURIComponent(show.banner.replace(/^https?:\/\//, ""))}`
+      : "",
+    show.poster
+      ? `https://images.weserv.nl/?url=${encodeURIComponent(show.poster.replace(/^https?:\/\//, ""))}`
+      : "",
+    "/placeholder.svg",
+  ].filter(Boolean);
+
+  const [idx, setIdx] = useState(0);
+
+  return (
+    <div className="relative aspect-video bg-secondary overflow-hidden">
+      <img
+        src={candidates[idx]}
+        alt={show.title}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        className="w-full h-full object-cover"
+        onError={() => {
+          if (idx < candidates.length - 1) setIdx(idx + 1);
+        }}
+      />
+    </div>
+  );
+};
+
 const Schedule = () => {
   const [shows, setShows] = useState<TheaterShow[]>([]);
   const [loading, setLoading] = useState(true);
