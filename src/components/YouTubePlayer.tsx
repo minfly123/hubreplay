@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2 } from "lucide-react";
+import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2, PictureInPicture2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
@@ -286,6 +286,37 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
       document.exitFullscreen();
       setIsFullscreen(false);
       try { screen.orientation?.unlock?.(); } catch {}
+    }
+  };
+
+  const togglePiP = async () => {
+    try {
+      // Check if any PiP is currently active
+      if ((document as any).pictureInPictureElement) {
+        await (document as any).exitPictureInPicture();
+        return;
+      }
+      // Find the iframe -> we need to get the underlying <video> element
+      // YouTube IFrame API doesn't expose <video> directly. We try to access via the iframe content or fallback.
+      const iframe = containerRef.current?.querySelector("iframe");
+      if (!iframe) {
+        return;
+      }
+      // Try to find a video element in the player wrapper (some browsers expose it)
+      const video = containerRef.current?.querySelector("video") as HTMLVideoElement | null;
+      if (video && video.requestPictureInPicture) {
+        await video.requestPictureInPicture();
+        return;
+      }
+      // Fallback: open YouTube in popup window mini player
+      const videoIdLocal = videoId;
+      window.open(
+        `https://www.youtube.com/embed/${videoIdLocal}?autoplay=1&start=${Math.floor(currentTime)}`,
+        "ytPip",
+        "width=480,height=270,resizable=yes"
+      );
+    } catch (err) {
+      console.error("PiP error:", err);
     }
   };
 
