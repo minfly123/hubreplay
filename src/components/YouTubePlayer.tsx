@@ -591,6 +591,13 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <button
+              onClick={togglePiP}
+              className="text-white hover:text-primary transition-colors"
+              title="Picture in Picture"
+            >
+              <PictureInPicture2 className="w-5 h-5" />
+            </button>
             <button onClick={toggleFullscreen} className="text-white hover:text-primary transition-colors">
               {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
             </button>
