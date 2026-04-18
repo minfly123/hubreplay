@@ -59,6 +59,37 @@ const Countdown = ({ target }: { target: string }) => {
   );
 };
 
+const ShowBanner = ({ show }: { show: TheaterShow }) => {
+  const candidates = [
+    show.banner,
+    show.poster,
+    show.banner
+      ? `https://images.weserv.nl/?url=${encodeURIComponent(show.banner.replace(/^https?:\/\//, ""))}`
+      : "",
+    show.poster
+      ? `https://images.weserv.nl/?url=${encodeURIComponent(show.poster.replace(/^https?:\/\//, ""))}`
+      : "",
+    "/placeholder.svg",
+  ].filter(Boolean);
+
+  const [idx, setIdx] = useState(0);
+
+  return (
+    <div className="relative aspect-video bg-secondary overflow-hidden">
+      <img
+        src={candidates[idx]}
+        alt={show.title}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        className="w-full h-full object-cover"
+        onError={() => {
+          if (idx < candidates.length - 1) setIdx(idx + 1);
+        }}
+      />
+    </div>
+  );
+};
+
 const Schedule = () => {
   const [shows, setShows] = useState<TheaterShow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,17 +150,9 @@ const Schedule = () => {
                 key={show.id}
                 className="overflow-hidden glass-card hover:border-primary/40 transition-colors"
               >
-                <div className="relative aspect-video bg-secondary overflow-hidden">
-                  <img
-                    src={show.banner || show.poster}
-                    alt={show.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = show.poster || "/placeholder.svg";
-                    }}
-                  />
-                  <div className="absolute top-2 right-2">
+                <ShowBanner show={show} />
+                <div className="relative">
+                  <div className="absolute -top-10 right-2 z-10">
                     <Badge className="bg-primary text-primary-foreground">{show.team}</Badge>
                   </div>
                 </div>
