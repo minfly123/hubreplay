@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2 } from "lucide-react";
+import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2, PictureInPicture2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
@@ -289,6 +289,37 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
     }
   };
 
+  const togglePiP = async () => {
+    try {
+      // Check if any PiP is currently active
+      if ((document as any).pictureInPictureElement) {
+        await (document as any).exitPictureInPicture();
+        return;
+      }
+      // Find the iframe -> we need to get the underlying <video> element
+      // YouTube IFrame API doesn't expose <video> directly. We try to access via the iframe content or fallback.
+      const iframe = containerRef.current?.querySelector("iframe");
+      if (!iframe) {
+        return;
+      }
+      // Try to find a video element in the player wrapper (some browsers expose it)
+      const video = containerRef.current?.querySelector("video") as HTMLVideoElement | null;
+      if (video && video.requestPictureInPicture) {
+        await video.requestPictureInPicture();
+        return;
+      }
+      // Fallback: open YouTube in popup window mini player
+      const videoIdLocal = videoId;
+      window.open(
+        `https://www.youtube.com/embed/${videoIdLocal}?autoplay=1&start=${Math.floor(currentTime)}`,
+        "ytPip",
+        "width=480,height=270,resizable=yes"
+      );
+    } catch (err) {
+      console.error("PiP error:", err);
+    }
+  };
+
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
@@ -560,6 +591,13 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <button
+              onClick={togglePiP}
+              className="text-white hover:text-primary transition-colors"
+              title="Picture in Picture"
+            >
+              <PictureInPicture2 className="w-5 h-5" />
+            </button>
             <button onClick={toggleFullscreen} className="text-white hover:text-primary transition-colors">
               {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
             </button>

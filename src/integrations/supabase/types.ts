@@ -346,6 +346,56 @@ export type Database = {
           },
         ]
       }
+      replay_lineups: {
+        Row: {
+          banner: string | null
+          created_at: string
+          id: string
+          members: Json
+          poster: string | null
+          replay_id: string
+          show_date: string | null
+          show_external_id: string | null
+          show_team: string | null
+          show_title: string
+          updated_at: string
+        }
+        Insert: {
+          banner?: string | null
+          created_at?: string
+          id?: string
+          members?: Json
+          poster?: string | null
+          replay_id: string
+          show_date?: string | null
+          show_external_id?: string | null
+          show_team?: string | null
+          show_title: string
+          updated_at?: string
+        }
+        Update: {
+          banner?: string | null
+          created_at?: string
+          id?: string
+          members?: Json
+          poster?: string | null
+          replay_id?: string
+          show_date?: string | null
+          show_external_id?: string | null
+          show_team?: string | null
+          show_title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replay_lineups_replay_id_fkey"
+            columns: ["replay_id"]
+            isOneToOne: true
+            referencedRelation: "replays"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       replay_unlock_tokens: {
         Row: {
           created_at: string

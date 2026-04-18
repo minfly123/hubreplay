@@ -21,6 +21,7 @@ import {
 import ReplayComments from "@/components/ReplayComments";
 import ReplayRating from "@/components/ReplayRating";
 import ReplayViewCount from "@/components/ReplayViewCount";
+import ReplayLineup from "@/components/ReplayLineup";
 import UsernameReminderDialog from "@/components/UsernameReminderDialog";
 
 const getYoutubeId = (url: string): string => {
@@ -87,7 +88,7 @@ const Watch = () => {
     };
   }, []);
 
-  // Fetch replay
+  // Fetch replay + realtime updates
   useEffect(() => {
     const fetchReplay = async () => {
       const { data } = await supabase
@@ -99,6 +100,19 @@ const Watch = () => {
       setLoading(false);
     };
     fetchReplay();
+
+    const channel = supabase
+      .channel(`replay-${id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "replays", filter: `id=eq.${id}` },
+        (payload) => setReplay(payload.new as Replay)
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [id]);
 
   // Check access
@@ -296,6 +310,13 @@ const Watch = () => {
             <h1 className="text-2xl font-display font-bold text-foreground mb-3">
               {replay.title}
             </h1>
+
+            <ReplayLineup
+              replayId={replay.id}
+              replayTitle={replay.title}
+              showTime={replay.show_time}
+            />
+
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
               <span className="flex items-center gap-1">
                 <Tag className="w-4 h-4" />

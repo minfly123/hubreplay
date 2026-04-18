@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, Gift, UserCircle, Sparkles, Ticket } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, Gift, UserCircle, Sparkles, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -86,11 +86,11 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   Hr-Ai
                 </button>
                 <button
-                  onClick={() => go("/lottery")}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/lottery") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                  onClick={() => go("/schedule")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/schedule") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
-                  <Ticket className="w-4 h-4" />
-                  Undian
+                  <Calendar className="w-4 h-4" />
+                  Jadwal Show
                 </button>
 
                 {isAdmin && (
