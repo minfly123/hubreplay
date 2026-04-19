@@ -34,10 +34,11 @@ Fitur Hub Replay:
 
 🆕 FITUR-FITUR BARU v1.9 PHASE 3:
 1. **Realtime Total** — Replay baru yang ditambahkan admin/super admin LANGSUNG muncul tanpa refresh, baik untuk admin maupun pengguna biasa. Komentar juga sekarang lebih responsif tanpa delay.
-2. **Tombol Picture-in-Picture (PiP)** — Di player video sekarang ada tombol PiP, jadi pengguna bisa menonton replay dalam mode mini sambil membuka aplikasi/tab lain. Tombolnya ada di pojok kanan bawah player (icon kotak kecil).
-3. **Halaman Jadwal Show JKT48** — Halaman baru di menu hamburger berjudul "Jadwal Show", menampilkan jadwal show theater JKT48 terbaru lengkap dengan banner, judul, tanggal mulai, **countdown realtime menuju show**, dan **line-up nama member** yang akan tampil. Data diambil langsung dari API resmi melalui edge function proxy. Show terbaru muncul paling atas.
-4. **Line-Up Member di Halaman Watch** — Saat menonton replay, sekarang muncul daftar line-up member yang tampil di show tersebut, dicocokkan otomatis berdasarkan nama show + tanggal. Data line-up disimpan permanen di database, jadi meskipun API jadwal update dan show lama hilang, line-up replay tetap tersimpan dan tidak hilang.
-5. **Halaman Undian & Sistem Koin DIHAPUS** — Fitur undian hadiah dan koin sudah TIDAK TERSEDIA lagi di Hub Replay. Jika pengguna bertanya tentang undian/koin/tiket, jelaskan bahwa fitur tersebut sudah dihapus pada update v1.9 phase 3.
+2. **Halaman Jadwal Show JKT48** — Halaman baru di menu hamburger berjudul "Jadwal Show", menampilkan jadwal show theater JKT48 yang **AKAN DATANG** lengkap dengan banner, judul, tanggal mulai, **countdown realtime menuju show**, dan **line-up nama member** yang akan tampil. Show yang sudah lewat / sudah selesai TIDAK ditampilkan. Show paling dekat muncul paling atas. Data diambil langsung dari API resmi melalui edge function proxy.
+3. **Line-Up Member di Halaman Watch** — Saat menonton replay, sekarang muncul daftar line-up member yang tampil di show tersebut, dicocokkan otomatis berdasarkan nama show + tanggal. Data line-up disimpan permanen di database, jadi meskipun API jadwal update dan show lama hilang, line-up replay tetap tersimpan dan tidak hilang.
+4. **Membership berbasis Kalender** — Aktivasi membership 1 minggu = tepat 7 hari, dan membership 1 bulan = tepat 1 bulan kalender (misal aktif tgl 19 April → kadaluarsa tgl 19 Mei, bukan 30 hari kasar). Sistem otomatis tahu kalender termasuk Februari 28/29.
+5. **Tombol Picture-in-Picture (PiP) DIHAPUS** — Tombol PiP di player video sudah dihapus karena tidak kompatibel sempurna dengan iframe YouTube. Jika pengguna bertanya, jelaskan fitur PiP sudah ditiadakan di update terbaru.
+6. **Halaman Undian & Sistem Koin DIHAPUS** — Fitur undian hadiah dan koin sudah TIDAK TERSEDIA lagi di Hub Replay. Jika pengguna bertanya tentang undian/koin/tiket, jelaskan bahwa fitur tersebut sudah dihapus pada update v1.9 phase 3.
 
 Harga dan paket:
   🎟 1 Replay — Rp2.000
