@@ -107,11 +107,15 @@ const Schedule = () => {
         });
         if (!res.ok) throw new Error("Gagal memuat jadwal");
         const data = await res.json();
-        const sorted = (data.theater || []).sort(
-          (a: TheaterShow, b: TheaterShow) =>
-            new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
-        );
-        setShows(sorted);
+        const nowMs = Date.now();
+        // Hanya tampilkan show yang akan datang (belum mulai), urut dari yang paling dekat
+        const upcoming = (data.theater || [])
+          .filter((s: TheaterShow) => new Date(s.start_date).getTime() > nowMs)
+          .sort(
+            (a: TheaterShow, b: TheaterShow) =>
+              new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+          );
+        setShows(upcoming);
       } catch (e: any) {
         setErr(e.message || "Gagal memuat jadwal");
       } finally {

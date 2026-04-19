@@ -68,11 +68,15 @@ const MembershipActivate = () => {
     const now = new Date();
     let expiresAt: string | null = null;
     if (membership.duration === "1_week") {
-      expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      // Tepat 7 hari dari sekarang
+      const exp = new Date(now);
+      exp.setDate(exp.getDate() + 7);
+      expiresAt = exp.toISOString();
     } else if (membership.duration === "1_month") {
-      expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    } else if (membership.duration === "1_month") {
-      expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      // Tepat 1 bulan kalender dari sekarang (tahu Februari 28/29, dll.)
+      const exp = new Date(now);
+      exp.setMonth(exp.getMonth() + 1);
+      expiresAt = exp.toISOString();
     }
 
     const { error } = await supabase
