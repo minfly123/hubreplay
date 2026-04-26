@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, Gift, UserCircle, Sparkles, Calendar } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Info } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -92,6 +92,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   <Calendar className="w-4 h-4" />
                   Jadwal Show
                 </button>
+                <button
+                  onClick={() => go("/about")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/about") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Info className="w-4 h-4" />
+                  Tentang Web
+                </button>
 
                 {isAdmin && (
                   <>
@@ -108,10 +115,6 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                     <button onClick={() => go("/replay-info")} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
                       <KeyRound className="w-4 h-4" />
                       Info Replay
-                    </button>
-                    <button onClick={() => go("/gift/admin")} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-                      <Gift className="w-4 h-4" />
-                      Gift
                     </button>
                     <button
                       onClick={() => goAdmin("/role/admin", true)}
