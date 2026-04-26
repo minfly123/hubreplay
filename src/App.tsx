@@ -24,6 +24,7 @@ import GiftClaim from "./pages/GiftClaim";
 import Profile from "./pages/Profile";
 import AiAssistant from "./pages/AiAssistant";
 import Schedule from "./pages/Schedule";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import Watermark from "@/components/Watermark";
 
@@ -55,6 +56,7 @@ const AppContent = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/ai" element={<AiAssistant />} />
         <Route path="/schedule" element={<Schedule />} />
+        <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Watermark />
