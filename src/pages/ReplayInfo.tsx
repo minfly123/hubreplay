@@ -156,6 +156,64 @@ const ReplayInfo = () => {
             <p className="text-muted-foreground text-center py-8">Belum ada replay tersedia.</p>
           )}
         </div>
+
+        {/* Panduan Cara Pemakaian */}
+        <div className="mt-10 glass-card p-5 sm:p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+              <Key className="w-4 h-4 text-primary" />
+            </div>
+            <h3 className="text-base font-display font-bold text-foreground">📘 Cara Pakai Halaman Info Replay</h3>
+          </div>
+
+          <div className="space-y-3 text-sm">
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">1. Lihat Info Replay</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Daftar semua replay yang tersedia di sistem</li>
+                <li>• Tiap replay menampilkan: judul, tipe, waktu show, status (Gratis/Berbayar), dan link tonton</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">2. Generate URL Kunci (Replay Berbayar)</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Klik ikon <span className="text-primary font-medium">🔑 (Kunci)</span> di replay berbayar</li>
+                <li>• Sistem auto-generate token unik untuk replay tersebut</li>
+                <li>• URL kunci akan muncul di bawah info replay (warna primary)</li>
+                <li>• URL kunci bersifat <span className="text-foreground font-medium">sekali pakai</span> dan berlaku <span className="text-foreground font-medium">24 jam</span></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">3. Salin & Kirim ke Pembeli</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Klik <span className="text-primary font-medium">"Salin Info"</span> untuk copy info lengkap (judul + tipe + tanggal + link tonton + URL kunci)</li>
+                <li>• Format pesan sudah rapi siap kirim ke WhatsApp pembeli</li>
+                <li>• Untuk replay <span className="text-foreground font-medium">gratis</span>, cukup salin link tonton tanpa perlu generate kunci</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">4. Cara Pembeli Pakai URL Kunci</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Pembeli klik URL kunci → login → otomatis unlock replay tersebut</li>
+                <li>• Setelah unlock, replay bisa ditonton kapan saja (akses permanen untuk replay itu)</li>
+                <li>• Format URL: <span className="font-mono text-primary">/unlock/[TOKEN]</span></li>
+              </ul>
+            </div>
+
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mt-3">
+              <p className="text-xs text-yellow-500 font-medium mb-1">⚠️ Tips Penting</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>• <span className="text-foreground">Jangan</span> bagikan URL kunci ke banyak orang — hanya untuk 1 pembeli</li>
+                <li>• Generate URL kunci <span className="text-foreground">setelah</span> pembeli sudah bayar</li>
+                <li>• Harga 1 replay: <span className="text-foreground font-medium">Rp 2.000</span></li>
+                <li>• Untuk akses banyak replay sekaligus, sarankan pembeli ambil <span className="text-foreground font-medium">Membership</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

@@ -244,6 +244,65 @@ const MembershipAdmin = () => {
             <p className="text-muted-foreground text-center py-8">Belum ada membership dibuat.</p>
           )}
         </div>
+
+        {/* Panduan Cara Pemakaian */}
+        <div className="mt-10 glass-card p-5 sm:p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-primary" />
+            </div>
+            <h3 className="text-base font-display font-bold text-foreground">📘 Cara Pakai Halaman Membership</h3>
+          </div>
+
+          <div className="space-y-3 text-sm">
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">1. Generate Token Membership</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Pilih durasi: <span className="text-foreground font-medium">1 Minggu, 1 Bulan, atau Permanen</span></li>
+                <li>• Klik tombol <span className="text-primary font-medium">"Buat Token"</span></li>
+                <li>• Sistem otomatis generate token unik 20 karakter</li>
+                <li>• Token bersifat <span className="text-foreground font-medium">sekali pakai</span> — setelah diaktivasi, tidak bisa dipakai lagi</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">2. Kirim ke Pembeli</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Klik tombol <span className="text-primary font-medium">"Salin Info"</span> untuk copy info lengkap (token + URL)</li>
+                <li>• Kirim URL aktivasi ke pembeli via WhatsApp/chat</li>
+                <li>• Format URL: <span className="font-mono text-primary">/membership/[TOKEN]</span></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">3. Pembeli Aktivasi</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Pembeli klik URL → login → otomatis aktivasi</li>
+                <li>• Durasi dihitung berbasis <span className="text-foreground font-medium">kalender</span> (bukan jumlah hari kasar)</li>
+                <li>• Contoh: aktivasi 1 Bulan tanggal 19 April → kadaluarsa tanggal 19 Mei</li>
+                <li>• Membership <span className="text-foreground font-medium">Permanen</span> tidak ada tanggal kadaluarsa</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">4. Pantau & Kelola</h4>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4">
+                <li>• Daftar membership menampilkan: token, durasi, tanggal kadaluarsa, dan email pembeli (setelah aktivasi)</li>
+                <li>• Token yang belum dipakai bisa dihapus dengan ikon 🗑</li>
+                <li>• Token yang sudah dipakai sebaiknya tidak dihapus untuk arsip</li>
+              </ul>
+            </div>
+
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mt-3">
+              <p className="text-xs text-yellow-500 font-medium mb-1">⚠️ Tips Penting</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>• Pastikan pembeli sudah <span className="text-foreground">login</span> sebelum klik URL aktivasi</li>
+                <li>• Catat email/nomor pembeli sebagai bukti transaksi</li>
+                <li>• Harga jual: 1 Minggu Rp7.000 • 1 Bulan Rp10.000 • Permanen Rp20.000</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

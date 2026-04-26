@@ -207,6 +207,22 @@ const Home = () => {
         )}
       </main>
 
+      {/* Partner Credit */}
+      <div className="container mx-auto px-4 pb-8">
+        <div className="glass-card p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">🤝 Bekerjasama dengan</span>
+            <span className="text-sm font-bold text-gradient">This Is Ucil Streaming Live</span>
+          </div>
+          <span className="hidden sm:inline text-muted-foreground/40">•</span>
+          <button
+            onClick={() => navigate("/about")}
+            className="text-xs text-primary hover:underline"
+          >
+            Pelajari lebih lanjut →
+          </button>
+        </div>
+      </div>
 
 
       <WelcomeDialog
