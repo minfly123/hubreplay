@@ -34,7 +34,7 @@ const About = () => {
             Hub <span className="text-gradient">Replay</span>
           </h1>
           <p className="text-sm text-muted-foreground">
-            Versi 1.9 Phase 3 — Resmi
+            Versi 1.9 Phase 4 — Rilis 16 Juli 2026
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Hub Replay adalah platform arsip independen untuk menonton ulang (replay) 
