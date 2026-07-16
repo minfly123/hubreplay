@@ -65,34 +65,51 @@ const MembershipActivate = () => {
     if (!user || !membership) return;
     setStatus("activating");
 
+    // Ambil IP publik pengguna untuk audit trail
+    let clientIp: string | null = null;
+    try {
+      const r = await fetch("https://api.ipify.org?format=json");
+      if (r.ok) {
+        const j = await r.json();
+        clientIp = j.ip || null;
+      }
+    } catch {
+      clientIp = null;
+    }
+
     const now = new Date();
     let expiresAt: string | null = null;
     if (membership.duration === "1_week") {
-      // Tepat 7 hari dari sekarang
+      // Tepat 7 hari dari sekarang (waktu aktivasi)
       const exp = new Date(now);
       exp.setDate(exp.getDate() + 7);
       expiresAt = exp.toISOString();
     } else if (membership.duration === "1_month") {
-      // Tepat 1 bulan kalender dari sekarang (tahu Februari 28/29, dll.)
+      // Tepat 1 bulan kalender dari waktu aktivasi
       const exp = new Date(now);
       exp.setMonth(exp.getMonth() + 1);
       expiresAt = exp.toISOString();
     }
+    // permanent → expiresAt tetap null (tidak pernah kadaluarsa)
 
-    const { error } = await supabase
+    // Update hanya jika masih belum digunakan (guard race condition)
+    const { error, data: updated } = await supabase
       .from("memberships")
       .update({
         is_used: true,
         activated_by: user.id,
         activated_at: now.toISOString(),
         expires_at: expiresAt,
+        activated_ip: clientIp,
       })
       .eq("id", membership.id)
-      .eq("is_used", false);
+      .eq("is_used", false)
+      .select()
+      .maybeSingle();
 
-    if (error) {
-      toast.error("Gagal mengaktivasi membership.");
-      setStatus("valid");
+    if (error || !updated) {
+      toast.error("Gagal mengaktivasi membership. URL kunci mungkin sudah dipakai.");
+      setStatus("used");
     } else {
       toast.success("Membership berhasil diaktivasi!");
       setStatus("done");
