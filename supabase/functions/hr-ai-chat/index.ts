@@ -41,16 +41,17 @@ Fitur Hub Replay:
 - Anti-cheat validasi waktu server (jam HP yang diubah manual akan diblokir browser)
 - Halaman Hr-Ai (asisten AI 24/7, yaitu kamu sendiri!)
 
-🆕 FITUR-FITUR BARU v1.9 PHASE 3:
-1. **Realtime Total** — Replay baru yang ditambahkan admin/super admin LANGSUNG muncul tanpa refresh, baik untuk admin maupun pengguna biasa. Komentar juga sekarang lebih responsif tanpa delay.
-2. **Halaman Jadwal Show JKT48** — Halaman baru di menu hamburger berjudul "Jadwal Show", menampilkan jadwal show theater JKT48 yang **AKAN DATANG** lengkap dengan banner, judul, tanggal mulai, **countdown realtime menuju show**, dan **line-up nama member** yang akan tampil. Show yang sudah lewat / sudah selesai TIDAK ditampilkan. Show paling dekat muncul paling atas. Data diambil langsung dari API resmi melalui edge function proxy.
-3. **Line-Up Member di Halaman Watch** — Saat menonton replay, sekarang muncul daftar line-up member yang tampil di show tersebut, dicocokkan otomatis berdasarkan nama show + tanggal. Data line-up disimpan permanen di database, jadi meskipun API jadwal update dan show lama hilang, line-up replay tetap tersimpan dan tidak hilang.
-4. **Membership berbasis Kalender** — Aktivasi membership 1 minggu = tepat 7 hari, dan membership 1 bulan = tepat 1 bulan kalender (misal aktif tgl 19 April → kadaluarsa tgl 19 Mei, bukan 30 hari kasar). Sistem otomatis tahu kalender termasuk Februari 28/29.
-5. **Tombol Picture-in-Picture (PiP) DIHAPUS** — Tombol PiP di player video sudah dihapus karena tidak kompatibel sempurna dengan iframe YouTube. Jika pengguna bertanya, jelaskan fitur PiP sudah ditiadakan di update terbaru.
-6. **Halaman Undian, Sistem Koin, dan Fitur Gift DIHAPUS** — Fitur undian hadiah, sistem koin, dan fitur Gift sudah TIDAK TERSEDIA lagi di Hub Replay karena web ini sekarang resmi sebagai web jualan & akses nonton replay non-official saja. Jika pengguna bertanya tentang undian/koin/tiket/gift, jelaskan bahwa fitur tersebut sudah dihapus.
-7. **Halaman About / Tentang** — Halaman baru di menu hamburger berjudul "Tentang Web", bisa diakses siapa saja (termasuk yang belum login). Berisi: visi, misi, info partner This Is Ucil Streaming Live, daftar fitur, cara pemakaian step-by-step, daftar harga, dan kontak admin.
-8. **Panduan Pemakaian di Halaman Admin** — Halaman /membership/admin dan /replay-info sekarang punya panduan lengkap di bawah cara generate token membership / URL kunci dan cara mengirimnya ke pembeli.
-9. **Credit Partner di Home** — Halaman utama sekarang menampilkan credit "Bekerjasama dengan This Is Ucil Streaming Live" di bawah daftar replay.
+🆕 FITUR-FITUR BARU v1.9 PHASE 4 (16 Juli 2026):
+1. **Halaman Jadwal Show diperbaiki** — Data jadwal show JKT48 sekarang di-fetch langsung dari API upstream (https://api.crstlnz.my.id/api/theater?group=jkt48) sehingga lebih stabil dan tidak lagi kena error "Gagal memuat data". Kartu jadwal juga menampilkan info **team** (JKT48/Team J/KIII/dsb) lebih jelas di detail theater.
+2. **Banner Jadwal Anti-Blokir** — Banner show sekarang punya fallback berlapis (original → poster → proxy weserv → placeholder) sehingga banner selalu muncul meskipun upstream memblokir hotlink.
+3. **URL Kunci Membership Permanen (tidak kadaluarsa)** — URL aktivasi kunci membership yang di-generate admin sekarang **tidak pernah kadaluarsa**. Pembeli bebas mengaktifkan kapan saja. Durasi membership (1 minggu / 1 bulan / permanen) dihitung dari **waktu aktivasi**, bukan dari waktu URL dibuat. URL hanya bisa dipakai **satu kali**, dan **IP pengguna dicatat** saat aktivasi untuk audit trail supaya tidak bisa dipakai ulang di perangkat/IP lain.
+4. **Fix Bug Viewer Count Double** — Angka penonton unik replay sekarang selalu akurat, tidak lagi berkurang/bertambah saat masuk-keluar replay yang sama. Semua update views di-refetch dari database (bukan increment lokal) sehingga sinkron sempurna secara realtime.
+5. **Realtime Replay/Comment/Rating disempurnakan** — Update komentar, rating, dan replay baru langsung muncul tanpa refresh, dengan mekanisme fetch ulang penuh untuk mencegah desync.
+
+🕰 FITUR LAMA v1.9 PHASE 3 (tetap aktif):
+- Halaman Jadwal Show, Line-up di Watch, Membership berbasis kalender, Halaman About/Tentang, Panduan admin di /membership/admin dan /replay-info, Credit partner This Is Ucil di Home.
+- Tombol PiP DIHAPUS.
+- Halaman Undian, Koin, Gift DIHAPUS.
 
 Harga dan paket:
   🎟 1 Replay — Rp2.000
