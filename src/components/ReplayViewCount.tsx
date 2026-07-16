@@ -9,25 +9,29 @@ const ReplayViewCount = ({ replayId }: { replayId: string }) => {
 
   const viewRecorded = useRef(false);
 
-  // Record view (only once per session per replay)
+  const fetchCount = async () => {
+    const { count: c } = await supabase
+      .from("replay_views")
+      .select("*", { count: "exact", head: true })
+      .eq("replay_id", replayId);
+    setCount(c ?? 0);
+  };
+
+  // Record view (only once per session per replay), then refetch count
   useEffect(() => {
     if (!user || viewRecorded.current) return;
     viewRecorded.current = true;
-    supabase
-      .from("replay_views")
-      .upsert({ replay_id: replayId, user_id: user.id }, { onConflict: "replay_id,user_id" })
-      .then(() => {});
+    (async () => {
+      await supabase
+        .from("replay_views")
+        .upsert({ replay_id: replayId, user_id: user.id }, { onConflict: "replay_id,user_id" });
+      await fetchCount();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, replayId]);
 
-  // Fetch count & subscribe to realtime
+  // Initial fetch + realtime subscription (refetch to avoid double count)
   useEffect(() => {
-    const fetchCount = async () => {
-      const { count: c } = await supabase
-        .from("replay_views")
-        .select("*", { count: "exact", head: true })
-        .eq("replay_id", replayId);
-      setCount(c ?? 0);
-    };
     fetchCount();
 
     const channel = supabase
@@ -36,7 +40,7 @@ const ReplayViewCount = ({ replayId }: { replayId: string }) => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "replay_views", filter: `replay_id=eq.${replayId}` },
         () => {
-          setCount((prev) => prev + 1);
+          fetchCount();
         }
       )
       .subscribe();
@@ -44,6 +48,7 @@ const ReplayViewCount = ({ replayId }: { replayId: string }) => {
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [replayId]);
 
   return (
