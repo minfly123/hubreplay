@@ -98,17 +98,13 @@ const Schedule = () => {
   useEffect(() => {
     const fetchShows = async () => {
       try {
-        const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/jkt48-schedule?group=jkt48`;
-        const res = await fetch(url, {
-          headers: {
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
+        // Fetch langsung dari API upstream (CORS diizinkan) — hindari edge function yang kadang diblokir upstream
+        const res = await fetch("https://api.crstlnz.my.id/api/theater?group=jkt48", {
+          headers: { Accept: "application/json" },
         });
         if (!res.ok) throw new Error("Gagal memuat jadwal");
         const data = await res.json();
         const nowMs = Date.now();
-        // Hanya tampilkan show yang akan datang (belum mulai), urut dari yang paling dekat
         const upcoming = (data.theater || [])
           .filter((s: TheaterShow) => new Date(s.start_date).getTime() > nowMs)
           .sort(
@@ -116,6 +112,7 @@ const Schedule = () => {
               new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
           );
         setShows(upcoming);
+        setErr(null);
       } catch (e: any) {
         setErr(e.message || "Gagal memuat jadwal");
       } finally {
