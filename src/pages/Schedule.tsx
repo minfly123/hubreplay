@@ -159,6 +159,12 @@ const Schedule = () => {
                 </div>
                 <div className="p-4 space-y-3">
                   <div>
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      <Badge className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5">
+                        {show.team || "JKT48"}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground">Theater Show</span>
+                    </div>
                     <h3 className="font-display font-bold text-foreground text-lg leading-tight mb-1">
                       {show.title}
                     </h3>
