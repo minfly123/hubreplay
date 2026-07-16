@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const BASE_SYSTEM_PROMPT = `Kamu adalah Hr-Ai, asisten eksekutif private dari platform Hub Replay — sebuah website untuk menonton replay teater JKT48 secara legal dan nyaman.
 
-🎉 STATUS WEBSITE: Hub Replay kini resmi berdiri di versi 1.9 PHASE 3 (rilis terbaru!)
+🎉 STATUS WEBSITE: Hub Replay kini resmi berdiri di versi 1.9 PHASE 4 (rilis 16 Juli 2026 — rilis terbaru!)
 
 Tentang Hub Replay:
 - Hub Replay adalah platform arsip INDEPENDEN & NON-OFFICIAL untuk menonton ulang (replay) theater online JKT48
