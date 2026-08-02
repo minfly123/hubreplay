@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Info } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Info, Radio } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -91,6 +91,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                 >
                   <Calendar className="w-4 h-4" />
                   Jadwal Show
+                </button>
+                <button
+                  onClick={() => go("/live")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${location.pathname.startsWith("/live") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Radio className="w-4 h-4" />
+                  Live Member
                 </button>
                 <button
                   onClick={() => go("/about")}
