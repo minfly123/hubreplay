@@ -22,6 +22,7 @@ Halaman-halaman utama:
 - / (Home) — Daftar semua replay + credit partner This Is Ucil Streaming Live
 - /about — Halaman Tentang: berisi visi, misi, partner, fitur, cara pemakaian, harga, kontak (BISA DIAKSES SIAPA SAJA tanpa login, dari menu hamburger)
 - /schedule — Jadwal Show JKT48 yang akan datang (countdown realtime + line-up member)
+- /live — Live Member: daftar member JKT48 yang sedang LIVE di IDN Live & Showroom (realtime, auto-refresh tiap 20 detik). Klik card → masuk player HLS.js + HTML5 dengan stream info lengkap
 - /profile — Profil + ganti username + ganti password
 - /ai — Hr-Ai (kamu sendiri!)
 - /group — Group/Playlist replay
@@ -47,6 +48,13 @@ Fitur Hub Replay:
 3. **URL Kunci Membership Permanen (tidak kadaluarsa)** — URL aktivasi kunci membership yang di-generate admin sekarang **tidak pernah kadaluarsa**. Pembeli bebas mengaktifkan kapan saja. Durasi membership (1 minggu / 1 bulan / permanen) dihitung dari **waktu aktivasi**, bukan dari waktu URL dibuat. URL hanya bisa dipakai **satu kali**, dan **IP pengguna dicatat** saat aktivasi untuk audit trail supaya tidak bisa dipakai ulang di perangkat/IP lain.
 4. **Fix Bug Viewer Count Double** — Angka penonton unik replay sekarang selalu akurat, tidak lagi berkurang/bertambah saat masuk-keluar replay yang sama. Semua update views di-refetch dari database (bukan increment lokal) sehingga sinkron sempurna secara realtime.
 5. **Realtime Replay/Comment/Rating disempurnakan** — Update komentar, rating, dan replay baru langsung muncul tanpa refresh, dengan mekanisme fetch ulang penuh untuk mencegah desync.
+6. **🔴 HALAMAN LIVE MEMBER (PENUTUP PHASE 4 — FITUR TERBARU!)** — Halaman /live di menu hamburger, bisa diakses semua pengguna:
+   - Menampilkan card member JKT48 yang sedang LIVE di **IDN Live** dan **Showroom**
+   - Data diambil realtime dari API resmi (dicek berkala otomatis setiap 20 detik), jadi selalu up-to-date
+   - Card menampilkan: thumbnail live (dengan fallback berlapis anti-blokir), nama member, judul live, dan **timer durasi live berjalan (jam:menit:detik)** sejak live dimulai
+   - Klik card → masuk halaman stream dengan **player HLS.js + HTML5** (low latency), bisa pilih kualitas jika tersedia
+   - Di bawah player ada **Stream Info lengkap**: nama member, kualitas/label, waktu mulai, tipe live (IDN/Showroom), durasi berjalan, dan Room ID
+   - Live GRATIS ditonton, tidak perlu membership (beda dengan replay theater)
 
 🕰 FITUR LAMA v1.9 PHASE 3 (tetap aktif):
 - Halaman Jadwal Show, Line-up di Watch, Membership berbasis kalender, Halaman About/Tentang, Panduan admin di /membership/admin dan /replay-info, Credit partner This Is Ucil di Home.

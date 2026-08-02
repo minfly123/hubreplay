@@ -25,6 +25,8 @@ import Profile from "./pages/Profile";
 import AiAssistant from "./pages/AiAssistant";
 import Schedule from "./pages/Schedule";
 import About from "./pages/About";
+import LiveMembers from "./pages/LiveMembers";
+import LiveStream from "./pages/LiveStream";
 import NotFound from "./pages/NotFound";
 import Watermark from "@/components/Watermark";
 
@@ -57,6 +59,8 @@ const AppContent = () => {
         <Route path="/ai" element={<AiAssistant />} />
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/about" element={<About />} />
+        <Route path="/live" element={<LiveMembers />} />
+        <Route path="/live/:type/:urlKey" element={<LiveStream />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Watermark />
