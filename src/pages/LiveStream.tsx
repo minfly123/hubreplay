@@ -9,7 +9,13 @@ import AppNavigation from "@/components/AppNavigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import { fetchNowLive, titleFromSlug, formatElapsed, type LiveMember } from "@/lib/liveUtils";
+import {
+  fetchNowLive,
+  titleFromSlug,
+  formatElapsed,
+  streamUrls,
+  type LiveMember,
+} from "@/lib/liveUtils";
 
 const LiveStream = () => {
   const { type, urlKey } = useParams();
@@ -57,8 +63,12 @@ const LiveStream = () => {
     };
   }, [urlKey, type]);
 
-  const streams = live?.streaming_url_list || [];
+  const streams = streamUrls(live);
   const stream = streams[qualityIdx] || streams[0];
+
+  useEffect(() => {
+    setQualityIdx(0);
+  }, [urlKey, type]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -113,6 +123,11 @@ const LiveStream = () => {
               />
             </div>
 
+            {!stream?.url && (
+              <p className="text-xs text-destructive">
+                URL stream (.m3u8) tidak tersedia untuk live ini.
+              </p>
+            )}
             {err && <p className="text-xs text-destructive">{err}</p>}
 
             <div>
@@ -184,6 +199,13 @@ const LiveStream = () => {
                   <span className="text-foreground font-medium">{live.room_id}</span>
                 </div>
               </div>
+              <div className="pt-1 border-t border-border/60">
+                <p className="text-muted-foreground text-xs mb-1">Stream URL (.m3u8):</p>
+                <p className="text-[11px] font-mono text-foreground break-all">
+                  {stream?.url || "-"}
+                </p>
+              </div>
+
             </Card>
           </div>
         )}

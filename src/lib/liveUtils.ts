@@ -52,6 +52,35 @@ export const imageCandidates = (live: {
   ) as string[];
 };
 
+/**
+ * Ambil semua kandidat URL .m3u8 milik satu member dari berbagai bentuk payload API.
+ */
+export const streamUrls = (live?: LiveMember | null): LiveStreamUrl[] => {
+  if (!live) return [];
+  const raw: any = live as any;
+  const pools: any[] = [
+    raw.streaming_url_list,
+    raw.streaming_url_list_dvr,
+    raw.streams,
+    raw.url ? [{ label: "Original", quality: 1080, url: raw.url }] : null,
+  ].filter(Boolean);
+
+  const list: LiveStreamUrl[] = [];
+  for (const pool of pools) {
+    for (const s of pool as any[]) {
+      const url: string | undefined = s?.url || s?.streaming_url || s?.src;
+      if (!url || !url.includes(".m3u8")) continue;
+      if (list.some((x) => x.url === url)) continue;
+      list.push({
+        label: s?.label || s?.quality_name || "Original",
+        quality: Number(s?.quality) || 1080,
+        url,
+      });
+    }
+  }
+  return list;
+};
+
 export const fetchNowLive = async (): Promise<LiveMember[]> => {
   const res = await fetch(NOW_LIVE_API, { headers: { Accept: "application/json" } });
   if (!res.ok) throw new Error("Gagal memuat data live");
