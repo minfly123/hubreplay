@@ -194,6 +194,13 @@ const LiveStream = () => {
                   <span className="text-foreground font-medium">{live.room_id}</span>
                 </div>
               </div>
+              <div className="pt-1 border-t border-border/60">
+                <p className="text-muted-foreground text-xs mb-1">Stream URL (.m3u8):</p>
+                <p className="text-[11px] font-mono text-foreground break-all">
+                  {stream?.url || "-"}
+                </p>
+              </div>
+
             </Card>
           </div>
         )}
