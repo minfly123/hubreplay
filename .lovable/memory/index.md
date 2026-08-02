@@ -16,5 +16,6 @@
 - [Community & Profiles](mem://features/community) — User profiles, mandatory usernames, chat, and ratings
 - [Core UI Components](mem://ui/core-components) — Splash screen, loading indicator, navigation, and welcome dialog
 - [Replay Metadata & Tracking](mem://features/replay-metadata) — Date constraints, unique viewer tracking, and search
+- [Live Member](mem://features/live-member) — Halaman /live: member JKT48 live IDN/Showroom, API now_live, player HLS.js
 - [Security & Protection](mem://features/security-protection) — Anti-inspect mechanisms and player access validation
 - [Marketing & AI Assistant](mem://features/marketing-ai) — Store, Reseller pricing, WA contact, and Hr-Ai assistant
