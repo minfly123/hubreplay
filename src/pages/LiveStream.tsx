@@ -57,8 +57,12 @@ const LiveStream = () => {
     };
   }, [urlKey, type]);
 
-  const streams = live?.streaming_url_list || [];
+  const streams = streamUrls(live);
   const stream = streams[qualityIdx] || streams[0];
+
+  useEffect(() => {
+    setQualityIdx(0);
+  }, [urlKey, type]);
 
   useEffect(() => {
     const video = videoRef.current;
