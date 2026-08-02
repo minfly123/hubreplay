@@ -123,6 +123,11 @@ const LiveStream = () => {
               />
             </div>
 
+            {!stream?.url && (
+              <p className="text-xs text-destructive">
+                URL stream (.m3u8) tidak tersedia untuk live ini.
+              </p>
+            )}
             {err && <p className="text-xs text-destructive">{err}</p>}
 
             <div>
