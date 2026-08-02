@@ -9,7 +9,13 @@ import AppNavigation from "@/components/AppNavigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import { fetchNowLive, titleFromSlug, formatElapsed, type LiveMember } from "@/lib/liveUtils";
+import {
+  fetchNowLive,
+  titleFromSlug,
+  formatElapsed,
+  streamUrls,
+  type LiveMember,
+} from "@/lib/liveUtils";
 
 const LiveStream = () => {
   const { type, urlKey } = useParams();
