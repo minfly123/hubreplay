@@ -65,6 +65,9 @@ const LiveStream = () => {
 
   const streams = streamUrls(live);
   const stream = streams[qualityIdx] || streams[0];
+  const playbackUrl = stream?.url
+    ? `https://api.crstlnz.my.id/api/stream?url=${encodeURIComponent(stream.url)}`
+    : null;
 
   useEffect(() => {
     setQualityIdx(0);
@@ -72,22 +75,40 @@ const LiveStream = () => {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !stream?.url) return;
+    if (!video || !playbackUrl) return;
 
     let hls: Hls | null = null;
+    setErr(null);
 
     if (Hls.isSupported()) {
-      hls = new Hls({ lowLatencyMode: true, liveSyncDurationCount: 3 });
-      hls.loadSource(stream.url);
+      hls = new Hls({
+        lowLatencyMode: true,
+        liveSyncDurationCount: 3,
+        manifestLoadingMaxRetry: 4,
+        levelLoadingMaxRetry: 4,
+        fragLoadingMaxRetry: 6,
+      });
+      hls.loadSource(playbackUrl);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        setErr(null);
         video.play().catch(() => {});
       });
       hls.on(Hls.Events.ERROR, (_e, data) => {
-        if (data.fatal) setErr("Stream tidak dapat dimuat. Coba pilih kualitas lain.");
+        if (!data.fatal) return;
+
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          hls?.startLoad();
+          return;
+        }
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          hls?.recoverMediaError();
+          return;
+        }
+        setErr("Siaran sedang tidak dapat diputar. Silakan coba lagi sebentar.");
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = stream.url;
+      video.src = playbackUrl;
       video.play().catch(() => {});
     } else {
       setErr("Browser tidak mendukung pemutaran HLS.");
@@ -96,7 +117,7 @@ const LiveStream = () => {
     return () => {
       hls?.destroy();
     };
-  }, [stream?.url]);
+  }, [playbackUrl]);
 
   return (
     <div className="min-h-screen bg-background">
