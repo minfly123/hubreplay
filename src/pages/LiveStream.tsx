@@ -17,6 +17,13 @@ import {
   type LiveMember,
 } from "@/lib/liveUtils";
 
+const STREAM_PROXY = "https://api.crstlnz.my.id/api/stream?url=";
+
+const proxiedStreamUrl = (url: string) => {
+  if (url.startsWith(STREAM_PROXY) || !url.includes(".playback.live-video.net/")) return url;
+  return `${STREAM_PROXY}${encodeURIComponent(url)}`;
+};
+
 const LiveStream = () => {
   const { type, urlKey } = useParams();
   const navigate = useNavigate();
@@ -65,9 +72,7 @@ const LiveStream = () => {
 
   const streams = streamUrls(live);
   const stream = streams[qualityIdx] || streams[0];
-  const playbackUrl = stream?.url
-    ? `https://api.crstlnz.my.id/api/stream?url=${encodeURIComponent(stream.url)}`
-    : null;
+  const playbackUrl = stream?.url ? proxiedStreamUrl(stream.url) : null;
 
   useEffect(() => {
     setQualityIdx(0);
@@ -87,6 +92,9 @@ const LiveStream = () => {
         manifestLoadingMaxRetry: 4,
         levelLoadingMaxRetry: 4,
         fragLoadingMaxRetry: 6,
+        xhrSetup: (xhr, url) => {
+          xhr.open("GET", proxiedStreamUrl(url), true);
+        },
       });
       hls.loadSource(playbackUrl);
       hls.attachMedia(video);
@@ -220,13 +228,6 @@ const LiveStream = () => {
                   <span className="text-foreground font-medium">{live.room_id}</span>
                 </div>
               </div>
-              <div className="pt-1 border-t border-border/60">
-                <p className="text-muted-foreground text-xs mb-1">Stream URL (.m3u8):</p>
-                <p className="text-[11px] font-mono text-foreground break-all">
-                  {stream?.url || "-"}
-                </p>
-              </div>
-
             </Card>
           </div>
         )}
