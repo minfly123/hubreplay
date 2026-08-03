@@ -19,8 +19,10 @@ import {
 
 const STREAM_PROXY = "https://api.crstlnz.my.id/api/stream?url=";
 
-const proxiedStreamUrl = (url: string) =>
-  url.startsWith(STREAM_PROXY) ? url : `${STREAM_PROXY}${encodeURIComponent(url)}`;
+const proxiedStreamUrl = (url: string) => {
+  if (url.startsWith(STREAM_PROXY) || !url.includes(".playback.live-video.net/")) return url;
+  return `${STREAM_PROXY}${encodeURIComponent(url)}`;
+};
 
 const LiveStream = () => {
   const { type, urlKey } = useParams();
