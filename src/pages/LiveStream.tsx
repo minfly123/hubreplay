@@ -17,10 +17,10 @@ import {
   type LiveMember,
 } from "@/lib/liveUtils";
 
-const STREAM_PROXY = "https://api.crstlnz.my.id/api/stream?url=";
+const STREAM_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/live-stream-proxy?url=`;
 
 const proxiedStreamUrl = (url: string) => {
-  if (url.startsWith(STREAM_PROXY) || !url.includes(".playback.live-video.net/")) return url;
+  if (url.startsWith(STREAM_PROXY)) return url;
   return `${STREAM_PROXY}${encodeURIComponent(url)}`;
 };
 
@@ -84,20 +84,21 @@ const LiveStream = () => {
 
     let hls: Hls | null = null;
     setErr(null);
+    video.removeAttribute("src");
+    video.load();
 
     if (Hls.isSupported()) {
       hls = new Hls({
         lowLatencyMode: true,
+        enableWorker: true,
+        backBufferLength: 30,
         liveSyncDurationCount: 3,
         manifestLoadingMaxRetry: 4,
         levelLoadingMaxRetry: 4,
         fragLoadingMaxRetry: 6,
-        xhrSetup: (xhr, url) => {
-          xhr.open("GET", proxiedStreamUrl(url), true);
-        },
       });
-      hls.loadSource(playbackUrl);
       hls.attachMedia(video);
+      hls.on(Hls.Events.MEDIA_ATTACHED, () => hls?.loadSource(playbackUrl));
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setErr(null);
         video.play().catch(() => {});
@@ -106,10 +107,12 @@ const LiveStream = () => {
         if (!data.fatal) return;
 
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-          hls?.startLoad();
+          setErr("Koneksi stream terputus. Mencoba menyambungkan kembali…");
+          window.setTimeout(() => hls?.startLoad(), 1000);
           return;
         }
         if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          setErr("Player sedang memulihkan video…");
           hls?.recoverMediaError();
           return;
         }
