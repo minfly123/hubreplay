@@ -97,7 +97,7 @@ const LiveStream = () => {
         levelLoadingMaxRetry: 4,
         fragLoadingMaxRetry: 6,
         xhrSetup: (xhr, requestUrl) => {
-          if (requestUrl.startsWith(STREAM_PROXY)) {
+          if (requestUrl.startsWith(import.meta.env.VITE_SUPABASE_URL)) {
             xhr.setRequestHeader("apikey", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
             xhr.setRequestHeader(
               "Authorization",
