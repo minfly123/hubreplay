@@ -21,6 +21,7 @@ export interface LiveMember {
 }
 
 export const NOW_LIVE_API = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/live-stream-proxy?action=lives`;
+const NOW_LIVE_FALLBACK = "https://api.crstlnz.my.id/api/now_live?group=jkt48";
 
 /**
  * Judul diambil dari slug: "-" dianggap spasi.
@@ -82,13 +83,16 @@ export const streamUrls = (live?: LiveMember | null): LiveStreamUrl[] => {
 };
 
 export const fetchNowLive = async (): Promise<LiveMember[]> => {
-  const res = await fetch(NOW_LIVE_API, {
+  let res = await fetch(NOW_LIVE_API, {
     headers: {
       Accept: "application/json",
       apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
   });
+  if (!res.ok) {
+    res = await fetch(NOW_LIVE_FALLBACK, { headers: { Accept: "application/json" } });
+  }
   if (!res.ok) throw new Error("Gagal memuat data live");
   const data = await res.json();
   const list: LiveMember[] = Array.isArray(data) ? data : data?.data || data?.now_live || [];
