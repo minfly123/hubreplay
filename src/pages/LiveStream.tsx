@@ -96,6 +96,15 @@ const LiveStream = () => {
         manifestLoadingMaxRetry: 4,
         levelLoadingMaxRetry: 4,
         fragLoadingMaxRetry: 6,
+        xhrSetup: (xhr, requestUrl) => {
+          if (requestUrl.startsWith(STREAM_PROXY)) {
+            xhr.setRequestHeader("apikey", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+            xhr.setRequestHeader(
+              "Authorization",
+              `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+            );
+          }
+        },
       });
       hls.attachMedia(video);
       hls.on(Hls.Events.MEDIA_ATTACHED, () => hls?.loadSource(playbackUrl));
@@ -119,8 +128,21 @@ const LiveStream = () => {
         setErr("Siaran sedang tidak dapat diputar. Silakan coba lagi sebentar.");
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = playbackUrl;
-      video.play().catch(() => {});
+      fetch(playbackUrl, {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Manifest tidak tersedia");
+          return response.blob();
+        })
+        .then((manifest) => {
+          video.src = URL.createObjectURL(manifest);
+          video.play().catch(() => {});
+        })
+        .catch(() => setErr("Siaran sedang tidak dapat diputar. Silakan coba lagi sebentar."));
     } else {
       setErr("Browser tidak mendukung pemutaran HLS.");
     }
