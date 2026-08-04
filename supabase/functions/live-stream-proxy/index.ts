@@ -1,6 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
-const SOURCE_PROXY = "https://api.crstlnz.my.id/api/stream?url=";
+const SOURCE_PROXY_HOST = "api.crstlnz.my.id";
 
 const jsonResponse = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), {
@@ -39,13 +39,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const upstream = await fetch(`${SOURCE_PROXY}${encodeURIComponent(streamUrl.toString())}`, {
+    const upstreamUrl = new URL(`https://${SOURCE_PROXY_HOST}/api/stream`);
+    upstreamUrl.searchParams.set("url", streamUrl.toString());
+    const upstream = await fetch(upstreamUrl, {
       headers: {
         Accept: "application/vnd.apple.mpegurl, application/x-mpegURL, */*",
-        Origin: "https://dc.crstlnz.my.id",
-        Referer: "https://dc.crstlnz.my.id/",
-        "User-Agent":
-          "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/131.0.0.0 Mobile Safari/537.36",
       },
     });
 
