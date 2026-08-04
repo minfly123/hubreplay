@@ -17,10 +17,10 @@ import {
   type LiveMember,
 } from "@/lib/liveUtils";
 
-const STREAM_PROXY = "https://api.crstlnz.my.id/api/stream?url=";
+const STREAM_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/live-stream-proxy?url=`;
 
 const proxiedStreamUrl = (url: string) => {
-  if (url.startsWith(STREAM_PROXY) || !url.includes(".playback.live-video.net/")) return url;
+  if (url.startsWith(STREAM_PROXY)) return url;
   return `${STREAM_PROXY}${encodeURIComponent(url)}`;
 };
 
@@ -84,20 +84,30 @@ const LiveStream = () => {
 
     let hls: Hls | null = null;
     setErr(null);
+    video.removeAttribute("src");
+    video.load();
 
     if (Hls.isSupported()) {
       hls = new Hls({
         lowLatencyMode: true,
+        enableWorker: true,
+        backBufferLength: 30,
         liveSyncDurationCount: 3,
         manifestLoadingMaxRetry: 4,
         levelLoadingMaxRetry: 4,
         fragLoadingMaxRetry: 6,
-        xhrSetup: (xhr, url) => {
-          xhr.open("GET", proxiedStreamUrl(url), true);
+        xhrSetup: (xhr, requestUrl) => {
+          if (requestUrl.startsWith(STREAM_PROXY)) {
+            xhr.setRequestHeader("apikey", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+            xhr.setRequestHeader(
+              "Authorization",
+              `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+            );
+          }
         },
       });
-      hls.loadSource(playbackUrl);
       hls.attachMedia(video);
+      hls.on(Hls.Events.MEDIA_ATTACHED, () => hls?.loadSource(playbackUrl));
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setErr(null);
         video.play().catch(() => {});
@@ -106,18 +116,33 @@ const LiveStream = () => {
         if (!data.fatal) return;
 
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-          hls?.startLoad();
+          setErr("Koneksi stream terputus. Mencoba menyambungkan kembali…");
+          window.setTimeout(() => hls?.startLoad(), 1000);
           return;
         }
         if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          setErr("Player sedang memulihkan video…");
           hls?.recoverMediaError();
           return;
         }
         setErr("Siaran sedang tidak dapat diputar. Silakan coba lagi sebentar.");
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = playbackUrl;
-      video.play().catch(() => {});
+      fetch(playbackUrl, {
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Manifest tidak tersedia");
+          return response.blob();
+        })
+        .then((manifest) => {
+          video.src = URL.createObjectURL(manifest);
+          video.play().catch(() => {});
+        })
+        .catch(() => setErr("Siaran sedang tidak dapat diputar. Silakan coba lagi sebentar."));
     } else {
       setErr("Browser tidak mendukung pemutaran HLS.");
     }
