@@ -8,6 +8,12 @@ const responseHeaders = {
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Expose-Headers": "Content-Length, Content-Range, Accept-Ranges",
 };
+const upstreamHeaders = {
+  Accept: "application/json, text/plain, */*",
+  Origin: "https://dc.crstlnz.my.id",
+  Referer: "https://dc.crstlnz.my.id/",
+  "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 Chrome/131.0.0.0 Mobile Safari/537.36",
+};
 
 const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -54,7 +60,7 @@ Deno.serve(async (req) => {
   const requestUrl = new URL(req.url);
   if (requestUrl.searchParams.get("action") === "lives") {
     try {
-      const upstream = await fetch(LIVE_API, { headers: { Accept: "application/json" } });
+      const upstream = await fetch(LIVE_API, { headers: upstreamHeaders });
       if (!upstream.ok) throw new Error("Live API unavailable");
       return jsonResponse(await upstream.json());
     } catch {
@@ -77,7 +83,7 @@ Deno.serve(async (req) => {
     let upstream = await fetch(sourceUrl, { headers });
     if (!upstream.ok && isManifest) {
       upstream = await fetch(`${STREAM_API}${encodeURIComponent(sourceUrl)}`, {
-        headers: { Accept: "application/vnd.apple.mpegurl, */*" },
+        headers: { ...upstreamHeaders, Accept: "application/vnd.apple.mpegurl, */*" },
       });
     }
     if (!upstream.ok) return jsonResponse({ error: "Stream is temporarily unavailable" }, upstream.status);
