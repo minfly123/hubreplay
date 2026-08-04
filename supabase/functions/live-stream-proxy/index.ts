@@ -40,7 +40,13 @@ Deno.serve(async (req) => {
 
   try {
     const upstream = await fetch(`${SOURCE_PROXY}${encodeURIComponent(streamUrl.toString())}`, {
-      headers: { Accept: "application/vnd.apple.mpegurl, application/x-mpegURL, */*" },
+      headers: {
+        Accept: "application/vnd.apple.mpegurl, application/x-mpegURL, */*",
+        Origin: "https://dc.crstlnz.my.id",
+        Referer: "https://dc.crstlnz.my.id/",
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/131.0.0.0 Mobile Safari/537.36",
+      },
     });
 
     if (!upstream.ok) {
