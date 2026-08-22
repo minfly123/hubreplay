@@ -37,17 +37,14 @@ const ReplayLineup = ({ replayId, replayTitle, showTime }: ReplayLineupProps) =>
         return;
       }
 
-      // 2. Try fetch from API + match
+      // 2. Try fetch from API + match (direct: upstream blocks server IPs)
       try {
-        const url = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/jkt48-schedule?group=jkt48`;
-        const res = await fetch(url, {
-          headers: {
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
+        const res = await fetch("https://api.crstlnz.my.id/api/theater?group=jkt48", {
+          headers: { Accept: "application/json" },
         });
         if (!res.ok) throw new Error("API failed");
         const data = await res.json();
+
         const list: any[] = data.theater || [];
 
         const targetTitle = normalize(replayTitle);
