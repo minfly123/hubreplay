@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
-import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2 } from "lucide-react";
+import { Play, Pause, Maximize, Minimize, Volume2, VolumeX, Settings, FastForward, Undo2, Redo2, Subtitles } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
@@ -65,6 +65,8 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
   const [speed, setSpeed] = useState(1);
   const [quality, setQuality] = useState("default");
   const [availableQualities, setAvailableQualities] = useState<string[]>([]);
+  const [ccTracks, setCcTracks] = useState<any[]>([]);
+  const [ccOn, setCcOn] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [ready, setReady] = useState(false);
@@ -274,6 +276,54 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
     if (!playerRef.current) return;
     playerRef.current.setPlaybackQuality(q);
     setQuality(q);
+  };
+
+  // Deteksi ketersediaan subtitle bawaan YouTube (default OFF)
+  useEffect(() => {
+    if (!ready) return;
+    let tries = 0;
+    const probe = () => {
+      const p = playerRef.current;
+      if (!p) return;
+      try {
+        p.loadModule?.("captions");
+        const list =
+          p.getOption?.("captions", "tracklist") || p.getOption?.("cc", "tracklist") || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setCcTracks(list);
+          // pastikan default tanpa subtitle
+          if (!ccOn) {
+            try { p.setOption?.("captions", "track", {}); } catch {}
+          }
+          return true;
+        }
+      } catch {}
+      return false;
+    };
+    if (probe()) return;
+    const iv = window.setInterval(() => {
+      tries += 1;
+      if (probe() || tries > 14) clearInterval(iv);
+    }, 1500);
+    return () => clearInterval(iv);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, videoId]);
+
+  const toggleCaptions = () => {
+    const p = playerRef.current;
+    if (!p || ccTracks.length === 0) return;
+    try {
+      if (ccOn) {
+        p.setOption("captions", "track", {});
+        setCcOn(false);
+      } else {
+        p.loadModule?.("captions");
+        const track = ccTracks[0];
+        p.setOption("captions", "track", { languageCode: track?.languageCode || "id" });
+        p.setOption?.("captions", "reload", true);
+        setCcOn(true);
+      }
+    } catch {}
   };
 
   const toggleFullscreen = () => {
@@ -521,6 +571,29 @@ const YouTubePlayer = forwardRef<YouTubePlayerHandle, YouTubePlayerProps>(
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={toggleCaptions}
+              disabled={ccTracks.length === 0}
+              aria-label="Subtitle"
+              title={
+                ccTracks.length === 0
+                  ? "Subtitle tidak tersedia untuk video ini"
+                  : ccOn
+                  ? "Matikan subtitle"
+                  : "Aktifkan subtitle"
+              }
+              className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-bold transition-colors ${
+                ccTracks.length === 0
+                  ? "text-white/30 cursor-not-allowed"
+                  : ccOn
+                  ? "text-primary bg-primary/20"
+                  : "text-white hover:text-primary"
+              }`}
+            >
+              <Subtitles className="w-5 h-5" />
+              CC
+            </button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="text-white hover:text-primary transition-colors">
