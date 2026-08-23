@@ -27,6 +27,8 @@ import Schedule from "./pages/Schedule";
 import About from "./pages/About";
 import LiveMembers from "./pages/LiveMembers";
 import LiveStream from "./pages/LiveStream";
+import RadioPage from "./pages/RadioPage";
+import NextBirthday from "./pages/NextBirthday";
 import NotFound from "./pages/NotFound";
 import Watermark from "@/components/Watermark";
 
@@ -61,6 +63,8 @@ const AppContent = () => {
         <Route path="/about" element={<About />} />
         <Route path="/live" element={<LiveMembers />} />
         <Route path="/live/:type/:urlKey" element={<LiveStream />} />
+        <Route path="/radio" element={<RadioPage />} />
+        <Route path="/birthday" element={<NextBirthday />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Watermark />

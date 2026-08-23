@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Play, Heart, Target, Sparkles, Users, Shield, Clock, KeyRound, CreditCard, MessageCircle, Star, Calendar, Handshake, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Play, Heart, Target, Sparkles, Users, Shield, Clock, KeyRound, CreditCard, MessageCircle, Star, Calendar, Handshake, AlertTriangle, Radio, Music, Cake, Captions, History } from "lucide-react";
 
 const About = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const About = () => {
             Hub <span className="text-gradient">Replay</span>
           </h1>
           <p className="text-sm text-muted-foreground">
-            Versi 1.9 Phase 4 — Rilis 16 Juli 2026
+            Versi Phase 5 v1.1 — Rilis 22 Agustus 2026
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Hub Replay adalah platform arsip independen untuk menonton ulang (replay) 
@@ -128,6 +128,11 @@ const About = () => {
               { icon: Star, title: "Rating Bintang", desc: "1-5 ⭐ realtime di setiap replay" },
               { icon: Clock, title: "Auto-Resume", desc: "Lanjut dari posisi terakhir" },
               { icon: Calendar, title: "Jadwal Show", desc: "Lihat jadwal show JKT48 yang akan datang" },
+              { icon: Calendar, title: "Jadwal Show", desc: "Lihat jadwal show JKT48 yang akan datang" },
+              { icon: Radio, title: "Live Member", desc: "Tonton member yang live di IDN & Showroom" },
+              { icon: Music, title: "JKT48 Radio", desc: "Radio khas JKT48 dari Cilacap, on air 24 jam" },
+              { icon: Cake, title: "Next Birthday", desc: "Countdown ulang tahun member realtime" },
+              { icon: Captions, title: "Subtitle [CC]", desc: "Aktifkan subtitle bawaan YouTube di player" },
               { icon: Sparkles, title: "Hr-Ai Assistant", desc: "Asisten AI 24/7 untuk bantu kamu" },
               { icon: Shield, title: "Anti-Cheat Waktu", desc: "Browser blokir akses jika jam HP diubah manual" },
             ].map((f, i) => (
