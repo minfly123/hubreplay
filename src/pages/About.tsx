@@ -227,6 +227,71 @@ const About = () => {
           <p className="text-xs text-muted-foreground text-center">Pembayaran via Dana / GoPay</p>
         </section>
 
+        {/* Log Update */}
+        <section className="glass-card p-6 sm:p-8 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <History className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-xl font-display font-bold text-foreground">Log Update</h2>
+          </div>
+          <div className="space-y-4">
+            {[
+              {
+                version: "Phase 5 v1.1",
+                date: "22 Agustus 2026",
+                latest: true,
+                items: [
+                  "Halaman JKT48 Radio — radio khas JKT48 dari Cilacap, on air 24 jam nonstop, pemutar modern + tombol share ke WhatsApp",
+                  "Halaman Next Birthday — countdown realtime ulang tahun member JKT48, diurutkan dari yang paling dekat",
+                  "Tombol Subtitle [CC] di Stream Player replay — default mati, bisa diaktifkan jika video punya subtitle bawaan YouTube",
+                  "Hr-Ai kini bisa membaca data member yang sedang live, jadwal show mendatang beserta line-up, dan data ulang tahun member secara realtime",
+                ],
+              },
+              {
+                version: "1.9 Phase 4",
+                date: "16 Juli 2026",
+                items: [
+                  "Halaman Live Member (IDN Live & Showroom) dengan player HLS + stream info",
+                  "Perbaikan Jadwal Show: info team, banner anti-blokir",
+                  "URL Kunci Membership jadi permanen (tidak kadaluarsa) + pencatatan IP aktivasi",
+                  "Fix bug viewer count double, realtime komentar/rating/replay disempurnakan",
+                ],
+              },
+              {
+                version: "1.9 Phase 3",
+                date: "April 2026",
+                items: [
+                  "Halaman Jadwal Show + line-up member di halaman Watch",
+                  "Halaman About/Tentang + panduan admin di Membership & Info Replay",
+                  "Membership berbasis kalender, credit partner This Is Ucil di Home",
+                  "Fitur Undian, Koin, Gift, dan PiP dihapus",
+                ],
+              },
+            ].map((log, i) => (
+              <div key={i} className="rounded-lg bg-secondary/30 p-4 space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-display font-bold text-foreground">{log.version}</span>
+                  <span className="text-xs text-muted-foreground">· {log.date}</span>
+                  {log.latest && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full gradient-primary text-primary-foreground font-semibold">
+                      TERBARU
+                    </span>
+                  )}
+                </div>
+                <ul className="space-y-1">
+                  {log.items.map((it, j) => (
+                    <li key={j} className="text-xs text-muted-foreground flex gap-2">
+                      <span className="text-primary">•</span>
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Kontak */}
         <section className="glass-card p-6 sm:p-8 space-y-3 text-center">
           <h2 className="text-xl font-display font-bold text-foreground">Kontak Admin</h2>
