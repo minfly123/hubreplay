@@ -122,7 +122,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, userTime, userTimezone } = await req.json();
+    const { messages, userTime, userTimezone, realtimeContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
