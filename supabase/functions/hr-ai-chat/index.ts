@@ -189,7 +189,8 @@ serve(async (req) => {
       .replace("{{POPULARITY_DATA}}", popularityList)
       .replace("{{TODAY_DATE}}", `${today}, ${nowTime} WIB`)
       .replace("{{USER_TIME}}", userTime || "tidak diketahui")
-      .replace("{{USER_TIMEZONE}}", userTimezone || "tidak diketahui");
+      .replace("{{USER_TIMEZONE}}", userTimezone || "tidak diketahui")
+      .replace("{{REALTIME_DATA}}", realtimeContext || "Data realtime tidak tersedia saat ini.");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
