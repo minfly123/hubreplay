@@ -7,6 +7,7 @@ import { ArrowLeft, Send, Bot, User, Trash2, Sparkles } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ReactMarkdown from "react-markdown";
 import { supabase } from "@/integrations/supabase/client";
+import { buildRealtimeContext } from "@/lib/aiContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -69,10 +70,12 @@ const AiAssistant = () => {
 
     try {
       const chatHistory = newMessages.map((m) => ({ role: m.role, content: m.content }));
+      const realtimeContext = await buildRealtimeContext().catch(() => "");
 
       const resp = await supabase.functions.invoke("hr-ai-chat", {
         body: { 
           messages: chatHistory,
+          realtimeContext,
           userTime: new Date().toLocaleString("id-ID", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
           userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },

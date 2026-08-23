@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Play, Heart, Target, Sparkles, Users, Shield, Clock, KeyRound, CreditCard, MessageCircle, Star, Calendar, Handshake, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Play, Heart, Target, Sparkles, Users, Shield, Clock, KeyRound, CreditCard, MessageCircle, Star, Calendar, Handshake, AlertTriangle, Radio, Music, Cake, Captions, History } from "lucide-react";
 
 const About = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const About = () => {
             Hub <span className="text-gradient">Replay</span>
           </h1>
           <p className="text-sm text-muted-foreground">
-            Versi 1.9 Phase 4 — Rilis 16 Juli 2026
+            Versi Phase 5 v1.1 — Rilis 22 Agustus 2026
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Hub Replay adalah platform arsip independen untuk menonton ulang (replay) 
@@ -128,6 +128,11 @@ const About = () => {
               { icon: Star, title: "Rating Bintang", desc: "1-5 ⭐ realtime di setiap replay" },
               { icon: Clock, title: "Auto-Resume", desc: "Lanjut dari posisi terakhir" },
               { icon: Calendar, title: "Jadwal Show", desc: "Lihat jadwal show JKT48 yang akan datang" },
+              { icon: Calendar, title: "Jadwal Show", desc: "Lihat jadwal show JKT48 yang akan datang" },
+              { icon: Radio, title: "Live Member", desc: "Tonton member yang live di IDN & Showroom" },
+              { icon: Music, title: "JKT48 Radio", desc: "Radio khas JKT48 dari Cilacap, on air 24 jam" },
+              { icon: Cake, title: "Next Birthday", desc: "Countdown ulang tahun member realtime" },
+              { icon: Captions, title: "Subtitle [CC]", desc: "Aktifkan subtitle bawaan YouTube di player" },
               { icon: Sparkles, title: "Hr-Ai Assistant", desc: "Asisten AI 24/7 untuk bantu kamu" },
               { icon: Shield, title: "Anti-Cheat Waktu", desc: "Browser blokir akses jika jam HP diubah manual" },
             ].map((f, i) => (
@@ -220,6 +225,71 @@ const About = () => {
             ))}
           </div>
           <p className="text-xs text-muted-foreground text-center">Pembayaran via Dana / GoPay</p>
+        </section>
+
+        {/* Log Update */}
+        <section className="glass-card p-6 sm:p-8 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <History className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-xl font-display font-bold text-foreground">Log Update</h2>
+          </div>
+          <div className="space-y-4">
+            {[
+              {
+                version: "Phase 5 v1.1",
+                date: "22 Agustus 2026",
+                latest: true,
+                items: [
+                  "Halaman JKT48 Radio — radio khas JKT48 dari Cilacap, on air 24 jam nonstop, pemutar modern + tombol share ke WhatsApp",
+                  "Halaman Next Birthday — countdown realtime ulang tahun member JKT48, diurutkan dari yang paling dekat",
+                  "Tombol Subtitle [CC] di Stream Player replay — default mati, bisa diaktifkan jika video punya subtitle bawaan YouTube",
+                  "Hr-Ai kini bisa membaca data member yang sedang live, jadwal show mendatang beserta line-up, dan data ulang tahun member secara realtime",
+                ],
+              },
+              {
+                version: "1.9 Phase 4",
+                date: "16 Juli 2026",
+                items: [
+                  "Halaman Live Member (IDN Live & Showroom) dengan player HLS + stream info",
+                  "Perbaikan Jadwal Show: info team, banner anti-blokir",
+                  "URL Kunci Membership jadi permanen (tidak kadaluarsa) + pencatatan IP aktivasi",
+                  "Fix bug viewer count double, realtime komentar/rating/replay disempurnakan",
+                ],
+              },
+              {
+                version: "1.9 Phase 3",
+                date: "April 2026",
+                items: [
+                  "Halaman Jadwal Show + line-up member di halaman Watch",
+                  "Halaman About/Tentang + panduan admin di Membership & Info Replay",
+                  "Membership berbasis kalender, credit partner This Is Ucil di Home",
+                  "Fitur Undian, Koin, Gift, dan PiP dihapus",
+                ],
+              },
+            ].map((log, i) => (
+              <div key={i} className="rounded-lg bg-secondary/30 p-4 space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-display font-bold text-foreground">{log.version}</span>
+                  <span className="text-xs text-muted-foreground">· {log.date}</span>
+                  {log.latest && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full gradient-primary text-primary-foreground font-semibold">
+                      TERBARU
+                    </span>
+                  )}
+                </div>
+                <ul className="space-y-1">
+                  {log.items.map((it, j) => (
+                    <li key={j} className="text-xs text-muted-foreground flex gap-2">
+                      <span className="text-primary">•</span>
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Kontak */}

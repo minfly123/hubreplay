@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Info, Radio } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Info, Radio, Music, Cake } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -98,6 +98,20 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                 >
                   <Radio className="w-4 h-4" />
                   Live Member
+                </button>
+                <button
+                  onClick={() => go("/radio")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/radio") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Music className="w-4 h-4" />
+                  JKT48 Radio
+                </button>
+                <button
+                  onClick={() => go("/birthday")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/birthday") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Cake className="w-4 h-4" />
+                  Next Birthday
                 </button>
                 <button
                   onClick={() => go("/about")}
