@@ -17,5 +17,6 @@
 - [Core UI Components](mem://ui/core-components) — Splash screen, loading indicator, navigation, and welcome dialog
 - [Replay Metadata & Tracking](mem://features/replay-metadata) — Date constraints, unique viewer tracking, and search
 - [Live Member](mem://features/live-member) — Halaman /live: member JKT48 live IDN/Showroom, API now_live, player HLS.js
+- [Radio & Next Birthday](mem://features/radio-birthday) — /radio, /birthday, tombol CC subtitle, konteks realtime Hr-Ai (Phase 5 v1.1)
 - [Security & Protection](mem://features/security-protection) — Anti-inspect mechanisms and player access validation
 - [Marketing & AI Assistant](mem://features/marketing-ai) — Store, Reseller pricing, WA contact, and Hr-Ai assistant
