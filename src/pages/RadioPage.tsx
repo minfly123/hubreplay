@@ -10,7 +10,7 @@ export const RADIO_STREAM_URL = "https://s2.kroyamedia.zone.id:8022/stream";
 export const RADIO_NAME = "JKT48 Radio Cilacap";
 
 const SHARE_TEXT =
-  "🎧 Dengerin JKT48 Radio 24 jam nonstop di Hub Replay! Lagu-lagu JKT48 favoritmu diputar tanpa henti, langsung dari Cilacap. Gratis, tinggal klik play 👇";
+  "🎧 Dengerin JKT48 Radio 24 jam nonstop di Arcanove48! Lagu-lagu JKT48 favoritmu diputar tanpa henti, langsung dari Cilacap. Gratis, tinggal klik play 👇";
 
 const RadioPage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -81,7 +81,7 @@ const RadioPage = () => {
   const shareNative = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: `${RADIO_NAME} — Hub Replay`, text: SHARE_TEXT, url: shareUrl });
+        await navigator.share({ title: `${RADIO_NAME} — Arcanove48`, text: SHARE_TEXT, url: shareUrl });
         return;
       } catch {
         return;
@@ -248,7 +248,7 @@ const RadioPage = () => {
         </section>
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          Siaran disediakan oleh Kroya Media (Cilacap). Hub Replay hanya menyediakan pemutar.
+          Siaran disediakan oleh Kroya Media (Cilacap). Arcanove48 hanya menyediakan pemutar.
         </p>
       </main>
     </div>

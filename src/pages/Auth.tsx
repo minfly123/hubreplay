@@ -58,7 +58,7 @@ const Auth = () => {
               <Play className="w-5 h-5 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-display font-bold text-foreground">
-              Hub <span className="text-gradient">Replay</span>
+              Arca<span className="text-gradient">nove48</span>
             </h1>
           </div>
           <p className="text-muted-foreground text-sm">

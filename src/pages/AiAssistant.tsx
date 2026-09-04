@@ -122,8 +122,8 @@ const AiAssistant = () => {
                 <Sparkles className="w-4 h-4 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-sm font-display font-bold text-foreground leading-tight">Hr-Ai</h1>
-                <p className="text-[10px] text-muted-foreground">Asisten Hub Replay</p>
+                <h1 className="text-sm font-display font-bold text-foreground leading-tight">Arva AI</h1>
+                <p className="text-[10px] text-muted-foreground">Asisten Arcanove48</p>
               </div>
             </div>
           </div>
@@ -140,9 +140,9 @@ const AiAssistant = () => {
               <Sparkles className="w-8 h-8 text-primary-foreground" />
             </div>
             <div>
-              <h2 className="text-lg font-display font-bold text-foreground">Halo! Saya Hr-Ai 👋</h2>
+              <h2 className="text-lg font-display font-bold text-foreground">Halo! Saya Arva AI 👋</h2>
               <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-                Asisten eksekutif Hub Replay. Tanya apa saja tentang membership, replay, group, atau fitur lainnya!
+                Asisten eksekutif Arcanove48. Tanya apa saja tentang membership, replay, group, atau fitur lainnya!
               </p>
             </div>
           </div>
@@ -205,7 +205,7 @@ const AiAssistant = () => {
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Tanya Hr-Ai..."
+            placeholder="Tanya Arva AI..."
             rows={1}
             className="flex-1 resize-none min-h-[44px] max-h-32"
             onKeyDown={(e) => {

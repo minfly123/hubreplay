@@ -53,7 +53,7 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   <div className="w-7 h-7 rounded-md gradient-primary flex items-center justify-center">
                     <Play className="w-3.5 h-3.5 text-primary-foreground" />
                   </div>
-                  Hub <span className="text-gradient">Replay</span>
+                  Arca<span className="text-gradient">nove48</span>
                 </SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-1">
@@ -83,7 +83,7 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/ai") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
                   <Sparkles className="w-4 h-4" />
-                  Hr-Ai
+                  Arva AI
                 </button>
                 <button
                   onClick={() => go("/schedule")}
@@ -167,7 +167,7 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
               <Play className="w-4 h-4 text-primary-foreground" />
             </div>
             <h1 className="text-xl font-display font-bold text-foreground">
-              Hub <span className="text-gradient">Replay</span>
+              Arca<span className="text-gradient">nove48</span>
             </h1>
           </div>
         </div>

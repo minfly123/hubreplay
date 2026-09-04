@@ -77,7 +77,7 @@ const birthdayContext = async (): Promise<string> => {
   }
 };
 
-/** Kumpulkan data realtime (live, jadwal, ulang tahun) dari sisi browser untuk Hr-Ai. */
+/** Kumpulkan data realtime (live, jadwal, ulang tahun) dari sisi browser untuk Arva AI. */
 export const buildRealtimeContext = async (): Promise<string> => {
   const [live, schedule, birthday] = await Promise.all([
     liveContext(),

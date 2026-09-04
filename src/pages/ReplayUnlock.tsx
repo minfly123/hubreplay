@@ -109,7 +109,7 @@ const ReplayUnlock = () => {
               <Play className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-foreground text-sm">
-              Hub <span className="text-gradient">Replay</span> — Buka Kunci
+              Arca<span className="text-gradient">nove48</span> — Buka Kunci
             </span>
           </div>
         </div>

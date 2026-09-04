@@ -126,7 +126,7 @@ const MembershipActivate = () => {
         <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center mx-auto glow-primary">
           <Play className="w-6 h-6 text-primary-foreground" />
         </div>
-        <h1 className="text-xl font-display font-bold text-foreground">Hub Replay Membership</h1>
+        <h1 className="text-xl font-display font-bold text-foreground">Arcanove48 Membership</h1>
 
         {status === "invalid" && (
           <div className="space-y-3">

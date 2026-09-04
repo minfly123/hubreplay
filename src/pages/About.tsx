@@ -18,7 +18,7 @@ const About = () => {
               <Play className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-foreground text-sm">
-              Tentang <span className="text-gradient">Hub Replay</span>
+              Tentang <span className="text-gradient">Arcanove48</span>
             </span>
           </div>
         </div>
@@ -31,13 +31,13 @@ const About = () => {
             <Play className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">
-            Hub <span className="text-gradient">Replay</span>
+            Arca<span className="text-gradient">nove48</span>
           </h1>
           <p className="text-sm text-muted-foreground">
             Versi Phase 5 v1.1 — Rilis 22 Agustus 2026
           </p>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Hub Replay adalah platform arsip independen untuk menonton ulang (replay) 
+            Arcanove48 adalah platform arsip independen untuk menonton ulang (replay) 
             theater online JKT48 dengan kualitas tinggi, akses fleksibel, dan harga ramah kantong.
           </p>
           <div className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/30">
@@ -63,8 +63,8 @@ const About = () => {
               <h3 className="font-semibold text-foreground">This Is Ucil Streaming Live</h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Hub Replay dengan bangga bekerjasama dengan <span className="text-foreground font-medium">This Is Ucil Streaming Live</span> sebagai 
-              media penyedia replay theater JKT48. Kerjasama ini memungkinkan Hub Replay 
+              Arcanove48 dengan bangga bekerjasama dengan <span className="text-foreground font-medium">This Is Ucil Streaming Live</span> sebagai 
+              media penyedia replay theater JKT48. Kerjasama ini memungkinkan Arcanove48 
               menyediakan koleksi replay yang lengkap dan berkualitas untuk para fans.
             </p>
           </div>
@@ -133,7 +133,7 @@ const About = () => {
               { icon: Music, title: "JKT48 Radio", desc: "Radio khas JKT48 dari Cilacap, on air 24 jam" },
               { icon: Cake, title: "Next Birthday", desc: "Countdown ulang tahun member realtime" },
               { icon: Captions, title: "Subtitle [CC]", desc: "Aktifkan subtitle bawaan YouTube di player" },
-              { icon: Sparkles, title: "Hr-Ai Assistant", desc: "Asisten AI 24/7 untuk bantu kamu" },
+              { icon: Sparkles, title: "Arva AI Assistant", desc: "Asisten AI 24/7 untuk bantu kamu" },
               { icon: Shield, title: "Anti-Cheat Waktu", desc: "Browser blokir akses jika jam HP diubah manual" },
             ].map((f, i) => (
               <div key={i} className="flex gap-3 p-3 rounded-lg bg-secondary/30">
@@ -245,7 +245,7 @@ const About = () => {
                   "Halaman JKT48 Radio — radio khas JKT48 dari Cilacap, on air 24 jam nonstop, pemutar modern + tombol share ke WhatsApp",
                   "Halaman Next Birthday — countdown realtime ulang tahun member JKT48, diurutkan dari yang paling dekat",
                   "Tombol Subtitle [CC] di Stream Player replay — default mati, bisa diaktifkan jika video punya subtitle bawaan YouTube",
-                  "Hr-Ai kini bisa membaca data member yang sedang live, jadwal show mendatang beserta line-up, dan data ulang tahun member secara realtime",
+                  "Arva AI kini bisa membaca data member yang sedang live, jadwal show mendatang beserta line-up, dan data ulang tahun member secara realtime",
                 ],
               },
               {
@@ -318,7 +318,7 @@ const About = () => {
             Bekerjasama dengan <span className="text-primary font-semibold">This Is Ucil Streaming Live</span>
           </p>
           <p className="text-[10px] text-muted-foreground/70 mt-2">
-            Hub Replay adalah platform independen non-official dan tidak berafiliasi langsung dengan JKT48 Operation Team.
+            Arcanove48 adalah platform independen non-official dan tidak berafiliasi langsung dengan JKT48 Operation Team.
           </p>
         </section>
       </main>

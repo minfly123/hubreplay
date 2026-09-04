@@ -52,7 +52,7 @@ const ReplayInfo = () => {
     const watchUrl = getWatchUrl(replay.id);
     const unlockUrl = generatedUrls[replay.id];
     
-    let text = `🎬 Info Replay Hub Replay\n\n📌 Judul: ${replay.title}\n🎭 Tipe: ${replay.type}\n📅 Waktu Show: ${new Date(replay.show_time).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}\n🔗 Link Replay: ${watchUrl}\n${replay.is_free ? "✅ Gratis" : "🔒 Berbayar"}`;
+    let text = `🎬 Info Replay Arcanove48\n\n📌 Judul: ${replay.title}\n🎭 Tipe: ${replay.type}\n📅 Waktu Show: ${new Date(replay.show_time).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}\n🔗 Link Replay: ${watchUrl}\n${replay.is_free ? "✅ Gratis" : "🔒 Berbayar"}`;
     
     if (!replay.is_free && unlockUrl) {
       text += `\n🔑 URL Kunci: ${unlockUrl}\n\n⚠️ URL kunci hanya bisa digunakan 1x dan berlaku 24 jam!\n⚠️ JANGAN membagikan URL kunci ini kepada orang lain!`;
@@ -85,7 +85,7 @@ const ReplayInfo = () => {
               <Play className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-foreground text-sm">
-              Hub <span className="text-gradient">Replay</span> — Info Replay
+              Arca<span className="text-gradient">nove48</span> — Info Replay
             </span>
           </div>
         </div>

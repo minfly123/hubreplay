@@ -270,7 +270,7 @@ const Watch = () => {
               <Play className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-foreground text-sm">
-              Hub <span className="text-gradient">Replay</span>
+              Arca<span className="text-gradient">nove48</span>
             </span>
           </div>
         </div>
