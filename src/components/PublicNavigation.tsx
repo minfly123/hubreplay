@@ -16,7 +16,7 @@ const PublicNavigation = () => {
             <Play className="w-4 h-4 text-primary-foreground" />
           </div>
           <h1 className="text-xl font-display font-bold text-foreground">
-            Hub <span className="text-gradient">Replay</span>
+            Arca<span className="text-gradient">nove48</span>
           </h1>
         </div>
         <div className="flex gap-2">

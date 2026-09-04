@@ -14,7 +14,7 @@ const TimeBlockScreen = () => {
         </p>
         <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
           <p className="text-sm text-foreground font-medium">
-            Untuk mengakses Hub Replay, pastikan:
+            Untuk mengakses Arcanove48, pastikan:
           </p>
           <ul className="text-sm text-muted-foreground mt-2 space-y-1 text-left list-disc list-inside">
             <li>Atur waktu perangkat ke <strong>Otomatis</strong></li>

@@ -99,7 +99,7 @@ const Store = () => {
 
       {/* Footer */}
       <footer className="border-t border-border py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Hub Replay. All rights reserved.
+        © {new Date().getFullYear()} Arcanove48. All rights reserved.
       </footer>
     </div>
   );

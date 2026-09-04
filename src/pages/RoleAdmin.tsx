@@ -111,7 +111,7 @@ const RoleAdmin = () => {
 
   const copyInfo = (inv: RoleInvitation) => {
     const url = `${window.location.origin}/role/${inv.token}`;
-    const text = `🛡️ Aktivasi Role Hub Replay\n\n📋 Role: ${ROLE_LABELS[inv.target_role]}\n🔗 URL Aktivasi: ${url}\n\n⚠️ Jangan bagikan link ini! Hanya bisa diaktivasi 1 kali untuk 1 akun.`;
+    const text = `🛡️ Aktivasi Role Arcanove48\n\n📋 Role: ${ROLE_LABELS[inv.target_role]}\n🔗 URL Aktivasi: ${url}\n\n⚠️ Jangan bagikan link ini! Hanya bisa diaktivasi 1 kali untuk 1 akun.`;
     navigator.clipboard.writeText(text);
     setCopiedId(inv.id);
     toast.success("Info disalin!");
@@ -137,7 +137,7 @@ const RoleAdmin = () => {
               <Play className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-foreground text-sm">
-              Hub <span className="text-gradient">Replay</span> — Aktivasi Role
+              Arca<span className="text-gradient">nove48</span> — Aktivasi Role
             </span>
           </div>
         </div>

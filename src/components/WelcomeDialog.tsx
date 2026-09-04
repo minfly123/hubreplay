@@ -30,7 +30,7 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
         <DialogHeader>
           <DialogTitle className="font-display text-xl flex items-center gap-2 text-foreground">
             <ShieldCheck className="w-6 h-6 text-primary" />
-            Selamat Datang di Hub Replay!
+            Selamat Datang di Arcanove48!
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
             Arsip Theater Online JKT48 — berikut panduan singkat untuk kamu.

@@ -120,7 +120,7 @@ const MembershipAdmin = () => {
 
   const copyMembershipInfo = (m: Membership) => {
     const url = `${window.location.origin}/membership/${m.token}`;
-    const text = `🎫 Membership Hub Replay\n\n📋 ID: ${m.id.slice(0, 8)}\n⏱ Durasi: ${DURATION_LABELS[m.duration]}\n🔗 URL Aktivasi: ${url}\n⏳ Masa Habis: ${getExpiryLabel(m)}\n\n⚠️ Jangan bagikan link ini! Hanya bisa diaktivasi 1 kali untuk 1 akun.`;
+    const text = `🎫 Membership Arcanove48\n\n📋 ID: ${m.id.slice(0, 8)}\n⏱ Durasi: ${DURATION_LABELS[m.duration]}\n🔗 URL Aktivasi: ${url}\n⏳ Masa Habis: ${getExpiryLabel(m)}\n\n⚠️ Jangan bagikan link ini! Hanya bisa diaktivasi 1 kali untuk 1 akun.`;
     navigator.clipboard.writeText(text);
     setCopiedId(m.id);
     toast.success("Info membership disalin!");
@@ -146,7 +146,7 @@ const MembershipAdmin = () => {
               <Play className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-foreground text-sm">
-              Hub <span className="text-gradient">Replay</span> — Membership
+              Arca<span className="text-gradient">nove48</span> — Membership
             </span>
           </div>
         </div>
