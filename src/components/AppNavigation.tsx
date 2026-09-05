@@ -62,7 +62,14 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
                   <Home className="w-4 h-4" />
-                  Home
+                  Home (Live Member)
+                </button>
+                <button
+                  onClick={() => go("/replay")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/replay") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Play className="w-4 h-4" />
+                  Replay Show
                 </button>
                 <button
                   onClick={() => go("/group")}
