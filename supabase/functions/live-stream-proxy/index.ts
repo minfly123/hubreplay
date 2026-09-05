@@ -2,7 +2,19 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const LIVE_API = "https://api.crstlnz.my.id/api/now_live?group=jkt48";
 const STREAM_API = "https://api.crstlnz.my.id/api/stream?url=";
-const ALLOWED_STREAM_HOST = ".playback.live-video.net";
+const ALLOWED_STREAM_HOSTS = [
+  ".playback.live-video.net",
+  ".live-video.net",
+  ".showroom-live.com",
+  ".showroom-cdn.com",
+  ".akamaized.net",
+  ".akamaihd.net",
+  ".cloudfront.net",
+  ".idn.media",
+  ".idnpay.com",
+  ".idnstatic.com",
+  ".crstlnz.my.id",
+];
 const responseHeaders = {
   ...corsHeaders,
   "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -24,7 +36,10 @@ const jsonResponse = (body: unknown, status = 200) =>
 const isAllowedStreamUrl = (value: string) => {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname.endsWith(ALLOWED_STREAM_HOST);
+    if (url.protocol !== "https:") return false;
+    return ALLOWED_STREAM_HOSTS.some(
+      (host) => url.hostname === host.slice(1) || url.hostname.endsWith(host)
+    );
   } catch {
     return false;
   }

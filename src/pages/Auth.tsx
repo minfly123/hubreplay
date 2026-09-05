@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useNavigate } from "react-router-dom";
 import PublicNavigation from "@/components/PublicNavigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Play, Mail, Lock, User } from "lucide-react";
+import { Play, Mail, Lock } from "lucide-react";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -37,13 +36,6 @@ const Auth = () => {
       }
     }
     setLoading(false);
-  };
-
-  const handleGoogleLogin = async () => {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (error) toast.error(error.message);
   };
 
   return (
@@ -104,21 +96,6 @@ const Auth = () => {
               {loading ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
             </Button>
           </form>
-
-          <div className="flex items-center gap-3 my-4">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-muted-foreground">atau</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full border-border"
-            onClick={handleGoogleLogin}
-          >
-            <User className="w-4 h-4 mr-2" />
-            Masuk dengan Google
-          </Button>
 
           <p className="text-center text-sm text-muted-foreground mt-4">
             {isLogin ? "Belum punya akun?" : "Sudah punya akun?"}{" "}

@@ -8,6 +8,8 @@ import { useTimeValidation } from "@/hooks/useTimeValidation";
 import TimeBlockScreen from "@/components/TimeBlockScreen";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Index from "./pages/Index";
+import ReplayHome from "./pages/ReplayHome";
+import Community from "./pages/Community";
 import Auth from "./pages/Auth";
 import Watch from "./pages/Watch";
 import Group from "./pages/Group";
@@ -45,6 +47,8 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/replay" element={<ReplayHome />} />
+        <Route path="/community" element={<Community />} />
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/group" element={<Group />} />
         <Route path="/group/invite/:token" element={<GroupInvite />} />

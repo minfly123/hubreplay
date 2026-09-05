@@ -85,14 +85,14 @@ const SplashScreen = ({ onFinish }: { onFinish: () => void }) => {
         <div
           className="overflow-hidden"
           style={{
-            width: showText ? "160px" : "0px",
+            width: showText ? "210px" : "0px",
             opacity: showText ? 1 : 0,
             transition: "width 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
           }}
         >
           <span className="font-display font-bold text-2xl whitespace-nowrap relative inline-block">
-            <span className="text-foreground">Hub</span>{" "}
-            <span className="text-gradient">Replay</span>
+            <span className="text-foreground">Arca</span>
+            <span className="text-gradient">nove48</span>
             {showGlow && (
               <span
                 className="absolute inset-0 pointer-events-none overflow-hidden"

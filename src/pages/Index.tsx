@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
-import Home from "./Home";
+import LiveMembers from "./LiveMembers";
 import SplashScreen, { shouldShowSplash } from "@/components/SplashScreen";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
@@ -24,7 +24,7 @@ const Index = () => {
   return (
     <>
       {showSplash && <SplashScreen onFinish={handleSplashFinish} />}
-      <Home />
+      <LiveMembers />
     </>
   );
 };

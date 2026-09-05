@@ -62,7 +62,14 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
                   <Home className="w-4 h-4" />
-                  Home
+                  Home (Live Member)
+                </button>
+                <button
+                  onClick={() => go("/replay")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/replay") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Play className="w-4 h-4" />
+                  Replay Show
                 </button>
                 <button
                   onClick={() => go("/group")}
@@ -93,13 +100,6 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   Jadwal Show
                 </button>
                 <button
-                  onClick={() => go("/live")}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${location.pathname.startsWith("/live") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-                >
-                  <Radio className="w-4 h-4" />
-                  Live Member
-                </button>
-                <button
                   onClick={() => go("/radio")}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/radio") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
@@ -112,6 +112,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                 >
                   <Cake className="w-4 h-4" />
                   Next Birthday
+                </button>
+                <button
+                  onClick={() => go("/community")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/community") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Users className="w-4 h-4" />
+                  About Community
                 </button>
                 <button
                   onClick={() => go("/about")}
