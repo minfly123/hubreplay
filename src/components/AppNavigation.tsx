@@ -114,6 +114,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   Next Birthday
                 </button>
                 <button
+                  onClick={() => go("/community")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/community") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Users className="w-4 h-4" />
+                  About Community
+                </button>
+                <button
                   onClick={() => go("/about")}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/about") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
