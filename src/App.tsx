@@ -8,6 +8,8 @@ import { useTimeValidation } from "@/hooks/useTimeValidation";
 import TimeBlockScreen from "@/components/TimeBlockScreen";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Index from "./pages/Index";
+import ReplayHome from "./pages/ReplayHome";
+import Community from "./pages/Community";
 import Auth from "./pages/Auth";
 import Watch from "./pages/Watch";
 import Group from "./pages/Group";
