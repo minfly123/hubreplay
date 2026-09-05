@@ -100,13 +100,6 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   Jadwal Show
                 </button>
                 <button
-                  onClick={() => go("/live")}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${location.pathname.startsWith("/live") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-                >
-                  <Radio className="w-4 h-4" />
-                  Live Member
-                </button>
-                <button
                   onClick={() => go("/radio")}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/radio") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
