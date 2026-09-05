@@ -47,6 +47,8 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/replay" element={<ReplayHome />} />
+        <Route path="/community" element={<Community />} />
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/group" element={<Group />} />
         <Route path="/group/invite/:token" element={<GroupInvite />} />
