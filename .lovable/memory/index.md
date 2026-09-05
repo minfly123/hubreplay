@@ -5,6 +5,7 @@
 - Partner resmi: "This Is Ucil Streaming Live" (penyedia replay) — credit harus muncul di Home & About.
 - Dark theme with red and pink accents (JKT48 visual identity).
 - Backend: Supabase (realtime DB, email auto-confirm, Google Login).
+- Home = Live Member (`/`), replay show di `/replay`. Login hanya email & password.
 - Display persistent watermark "Create by Dimzzvloper" bottom right on all pages.
 - Halaman /about bisa diakses siapa saja (termasuk yang belum login) dari hamburger menu.
 - Fitur Gift, undian, dan koin SUDAH DIHAPUS — jangan re-add.
