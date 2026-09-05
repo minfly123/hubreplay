@@ -163,7 +163,7 @@ const About = () => {
                 Daftar / Login
               </h3>
               <p className="text-xs text-muted-foreground pl-8 leading-relaxed">
-                Buat akun dengan email atau login pakai Google. Setelah login, kamu wajib mengisi 
+                Buat akun dengan email & kata sandi. Setelah login, kamu wajib mengisi 
                 <span className="text-foreground font-medium"> username</span> agar bisa menonton replay.
               </p>
             </div>
