@@ -47,9 +47,6 @@ const AiAssistant = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-  }, []);
-
-  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
