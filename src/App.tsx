@@ -26,7 +26,6 @@ import GiftClaim from "./pages/GiftClaim";
 import Profile from "./pages/Profile";
 import AiAssistant from "./pages/AiAssistant";
 import Schedule from "./pages/Schedule";
-import About from "./pages/About";
 import LiveMembers from "./pages/LiveMembers";
 import LiveStream from "./pages/LiveStream";
 import RadioPage from "./pages/RadioPage";
@@ -64,7 +63,6 @@ const AppContent = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/ai" element={<AiAssistant />} />
         <Route path="/schedule" element={<Schedule />} />
-        <Route path="/about" element={<About />} />
         <Route path="/live" element={<LiveMembers />} />
         <Route path="/live/:type/:urlKey" element={<LiveStream />} />
         <Route path="/radio" element={<RadioPage />} />
