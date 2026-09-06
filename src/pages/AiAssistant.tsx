@@ -47,10 +47,6 @@ const AiAssistant = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!authLoading && !user) navigate("/auth", { replace: true });
-  }, [authLoading, user, navigate]);
-
-  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -107,7 +103,6 @@ const AiAssistant = () => {
   };
 
   if (authLoading) return <LoadingSpinner />;
-  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

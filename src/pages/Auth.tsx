@@ -54,7 +54,7 @@ const Auth = () => {
             </h1>
           </div>
           <p className="text-muted-foreground text-sm">
-            Arsip Theater Online JKT48
+            Website Resmi Komunitas Arcanove48
           </p>
         </div>
 

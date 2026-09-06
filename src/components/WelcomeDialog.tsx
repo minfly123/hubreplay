@@ -33,7 +33,7 @@ const WelcomeDialog = ({ open, onClose }: WelcomeDialogProps) => {
             Selamat Datang di Arcanove48!
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Arsip Theater Online JKT48 — berikut panduan singkat untuk kamu.
+            Website Resmi Komunitas Arcanove48 — berikut panduan singkat untuk kamu.
           </DialogDescription>
         </DialogHeader>
 

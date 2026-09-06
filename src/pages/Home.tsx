@@ -214,13 +214,6 @@ const Home = () => {
             <span className="text-xs text-muted-foreground">🤝 Bekerjasama dengan</span>
             <span className="text-sm font-bold text-gradient">This Is Ucil Streaming Live</span>
           </div>
-          <span className="hidden sm:inline text-muted-foreground/40">•</span>
-          <button
-            onClick={() => navigate("/about")}
-            className="text-xs text-primary hover:underline"
-          >
-            Pelajari lebih lanjut →
-          </button>
         </div>
       </div>
 

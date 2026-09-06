@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Info, Radio, Music, Cake } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Radio, Music, Cake, LogIn } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -78,13 +78,13 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                   <ListVideo className="w-4 h-4" />
                   Group
                 </button>
-                <button
+                {user && (<button
                   onClick={() => go("/profile")}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/profile") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
                 >
                   <UserCircle className="w-4 h-4" />
                   Profil
-                </button>
+                </button>)}
                 <button
                   onClick={() => go("/ai")}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/ai") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
@@ -119,13 +119,6 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                 >
                   <Users className="w-4 h-4" />
                   About Community
-                </button>
-                <button
-                  onClick={() => go("/about")}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/about") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
-                >
-                  <Info className="w-4 h-4" />
-                  Tentang Web
                 </button>
 
                 {isAdmin && (
@@ -180,12 +173,25 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground hidden sm:block">
-            {user?.email}
-          </span>
-          <Button variant="ghost" size="sm" onClick={signOut}>
-            <LogOut className="w-4 h-4" />
-          </Button>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground hidden sm:block">
+                {user.email}
+              </span>
+              <Button variant="ghost" size="sm" onClick={signOut}>
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => navigate("/auth")}
+              className="gradient-primary text-primary-foreground font-semibold"
+            >
+              <LogIn className="w-4 h-4 mr-1.5" />
+              Login / Daftar
+            </Button>
+          )}
         </div>
       </div>
     </header>
