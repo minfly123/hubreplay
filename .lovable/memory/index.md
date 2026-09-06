@@ -10,6 +10,8 @@
 - Halaman /about bisa diakses siapa saja (termasuk yang belum login) dari hamburger menu.
 - Fitur Gift, undian, dan koin SUDAH DIHAPUS — jangan re-add.
 
+- Website resmi Komunitas Arcanove48; halaman "Tentang Web" (/about) dihapus. Login/daftar tidak wajib — tombol Login/Daftar di header.
+
 ## Memories
 - [Access Control](mem://features/access-control) — Logic for granting access via Membership, Unlock URLs, Groups (Gift dihapus)
 - [Video Player](mem://features/video-player) — Custom YouTube iframe player, auto-resume, screen persistence (PiP dihapus)
