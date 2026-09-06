@@ -1,13 +1,12 @@
 # Project Memory
 
 ## Core
-- "Arcanove48" (dulu Hub Replay): komunitas JKT48 + arsip replay theater, AI bernama Arva AI — INDEPENDEN & NON-OFFICIAL (tidak berafiliasi langsung dengan JKT48 Operation Team).
-- Partner resmi: "This Is Ucil Streaming Live" (penyedia replay) — credit harus muncul di Home & About.
+- "Arcanove48": WEBSITE RESMI Komunitas Arcanove48 (fans JKT48), AI bernama Arva AI. Jangan sebut "platform arsip independen/non-official".
+- Partner resmi: "This Is Ucil Streaming Live" (penyedia replay) — credit harus muncul di Home.
 - Dark theme with red and pink accents (JKT48 visual identity).
 - Backend: Supabase (realtime DB, email auto-confirm). Login hanya email & password — Google login dihapus.
 - Home = Live Member (`/`), replay show di `/replay`. Login hanya email & password.
 - Display persistent watermark "Create by Dimzzvloper" bottom right on all pages.
-- Halaman /about bisa diakses siapa saja (termasuk yang belum login) dari hamburger menu.
 - Fitur Gift, undian, dan koin SUDAH DIHAPUS — jangan re-add.
 
 - Website resmi Komunitas Arcanove48; halaman "Tentang Web" (/about) dihapus. Login/daftar tidak wajib — tombol Login/Daftar di header.
