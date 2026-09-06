@@ -1,12 +1,11 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Navigate } from "react-router-dom";
 import LiveMembers from "./LiveMembers";
 import SplashScreen, { shouldShowSplash } from "@/components/SplashScreen";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [showSplash, setShowSplash] = useState(() => shouldShowSplash());
 
   const handleSplashFinish = useCallback(() => {
@@ -15,10 +14,6 @@ const Index = () => {
 
   if (loading) {
     return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
   }
 
   return (
