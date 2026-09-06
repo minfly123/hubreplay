@@ -94,6 +94,42 @@ export type Database = {
           },
         ]
       }
+      event_gallery: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_date: string
+          id: string
+          image_url: string
+          location: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_date: string
+          id?: string
+          image_url: string
+          location: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_date?: string
+          id?: string
+          image_url?: string
+          location?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gift_claims: {
         Row: {
           claimed_at: string
