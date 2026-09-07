@@ -11,6 +11,9 @@ import Index from "./pages/Index";
 import ReplayHome from "./pages/ReplayHome";
 import Community from "./pages/Community";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
+import EventGallery from "./pages/EventGallery";
+import EventSchedule from "./pages/EventSchedule";
 import Watch from "./pages/Watch";
 import Group from "./pages/Group";
 import GroupInvite from "./pages/GroupInvite";
@@ -46,7 +49,10 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/replay" element={<ReplayHome />} />
+        <Route path="/gallery" element={<EventGallery />} />
+        <Route path="/events" element={<EventSchedule />} />
         <Route path="/community" element={<Community />} />
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/group" element={<Group />} />

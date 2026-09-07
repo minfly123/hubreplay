@@ -21,13 +21,23 @@ const Auth = () => {
     if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error(error.message);
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          toast.error(
+            "Email atau kata sandi salah. Kalau akunmu dulu dibuat lewat Google, klik \"Lupa kata sandi?\" untuk membuat kata sandi baru."
+          );
+        } else {
+          toast.error(error.message);
+        }
       } else {
         toast.success("Login berhasil!");
         navigate("/");
       }
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
       if (error) {
         toast.error(error.message);
       } else {
@@ -36,6 +46,23 @@ const Auth = () => {
       }
     }
     setLoading(false);
+  };
+
+  const handleForgot = async () => {
+    if (!email) {
+      toast.error("Masukkan emailmu dulu, lalu klik lagi.");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Link atur kata sandi sudah dikirim ke emailmu.");
   };
 
   return (
@@ -96,6 +123,14 @@ const Auth = () => {
               {loading ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
             </Button>
           </form>
+
+          {isLogin && (
+            <p className="text-center text-sm mt-3">
+              <button type="button" onClick={handleForgot} className="text-primary hover:underline font-medium">
+                Lupa kata sandi?
+              </button>
+            </p>
+          )}
 
           <p className="text-center text-sm text-muted-foreground mt-4">
             {isLogin ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
