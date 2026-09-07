@@ -124,6 +124,14 @@ const Auth = () => {
             </Button>
           </form>
 
+          {isLogin && (
+            <p className="text-center text-sm mt-3">
+              <button type="button" onClick={handleForgot} className="text-primary hover:underline font-medium">
+                Lupa kata sandi?
+              </button>
+            </p>
+          )}
+
           <p className="text-center text-sm text-muted-foreground mt-4">
             {isLogin ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
             <button

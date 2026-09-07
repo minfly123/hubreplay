@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Radio, Music, Cake, LogIn } from "lucide-react";
+import { Menu, Play, Home, ListVideo, LogOut, Users, CreditCard, KeyRound, ShieldCheck, HelpCircle, UserCircle, Sparkles, Calendar, Radio, Music, Cake, LogIn, Images, PartyPopper } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppNavigationProps {
@@ -98,6 +98,20 @@ const AppNavigation = ({ onOpenWelcome }: AppNavigationProps) => {
                 >
                   <Calendar className="w-4 h-4" />
                   Jadwal Show
+                </button>
+                <button
+                  onClick={() => go("/gallery")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/gallery") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <Images className="w-4 h-4" />
+                  Galeri Event
+                </button>
+                <button
+                  onClick={() => go("/events")}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive("/events") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary"}`}
+                >
+                  <PartyPopper className="w-4 h-4" />
+                  Event Schedule
                 </button>
                 <button
                   onClick={() => go("/radio")}

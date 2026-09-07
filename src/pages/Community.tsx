@@ -10,10 +10,13 @@ import {
   Newspaper,
   Sparkles,
   Instagram,
+  MessagesSquare,
   MapPin,
   MessageCircle,
   Ticket,
 } from "lucide-react";
+
+const WA_GROUP_URL = "https://chat.whatsapp.com/EXtrxP0C1fN3aUv22LWa9M";
 
 const INSTAGRAM_URL =
   "https://www.instagram.com/arcanove48_ofc?igsi=MTVpc2N1NGEzbTdicA==";
@@ -145,6 +148,17 @@ const Community = () => {
             <Instagram className="w-5 h-5" />
             @arcanove48_ofc
           </a>
+          <div>
+            <a
+              href={WA_GROUP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-secondary text-foreground font-semibold border border-border hover:bg-secondary/70 transition-colors"
+            >
+              <MessagesSquare className="w-5 h-5 text-primary" />
+              Join Grup WhatsApp Komunitas
+            </a>
+          </div>
         </section>
       </main>
     </div>
