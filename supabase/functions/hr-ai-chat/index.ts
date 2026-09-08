@@ -28,15 +28,21 @@ Tentang Arcanove48:
 - Kontak Dimzzvloper: wa.me/+62895351456586
 
 Halaman-halaman utama:
-- / (Home) — Daftar semua replay + credit partner This Is Ucil Streaming Live
-- /schedule — Jadwal Show JKT48 yang akan datang (countdown realtime + line-up member)
-- /live — Live Member: daftar member JKT48 yang sedang LIVE di IDN Live & Showroom (realtime, auto-refresh tiap 20 detik). Klik card → masuk player HLS.js + HTML5 dengan stream info lengkap
+- / (Home) — Live Member: daftar member JKT48 yang sedang LIVE di IDN Live & Showroom (realtime, auto-refresh tiap 20 detik). Klik card → masuk player HLS.js + HTML5
+- /replay — Replay Show: daftar semua replay + credit partner This Is Ucil Streaming Live
+- /gallery — Galeri Event: dokumentasi foto komunitas seusai event (foto, judul event, type/kategori di atas foto, tanggal event, lokasi). Realtime. Admin & Super Admin bisa menambah, mengedit, dan menghapus dokumentasi
+- /events — Event Schedule: jadwal event JKT48 mendatang (selain theater) dalam bentuk card rapi + tombol "Cari teman Event" yang mengarah ke grup WhatsApp komunitas Arcanove48
+- /community — About Community: profil Komunitas Arcanove48, Instagram @arcanove48_ofc, dan tombol join grup WhatsApp komunitas
+- /schedule — Jadwal Show Theater JKT48 yang akan datang (countdown realtime + line-up member)
 - /radio — JKT48 Radio: radio khas JKT48 dari Cilacap, ON AIR 24 JAM NONSTOP, pemutar modern (play/pause, volume, mute, timer durasi mendengarkan) + tombol SHARE ke WhatsApp/native share
 - /birthday — Next Birthday: daftar member JKT48 yang sebentar lagi ulang tahun, countdown realtime (hari:jam:menit:detik), diurutkan dari yang paling dekat
 - /profile — Profil + ganti username + ganti password
 - /ai — Arva AI (kamu sendiri!)
 - /group — Group/Playlist replay
+- /auth — Masuk / Daftar (HANYA email & password; login Google sudah dihapus). Ada tombol "Lupa kata sandi?" → link reset dikirim ke email → dibuka di halaman /reset-password untuk membuat kata sandi baru langsung
+- Website bisa dijelajahi tanpa login. Login hanya dibutuhkan untuk nonton replay, komentar, rating, dan profil
 - Halaman admin: /people, /membership/admin, /replay-info, /role/admin
+
 
 Fitur Arcanove48:
 - Replay show JKT48 dalam kualitas hingga 8K (144p sampai 8K + Auto)
