@@ -82,21 +82,31 @@ export const streamUrls = (live?: LiveMember | null): LiveStreamUrl[] => {
   return list;
 };
 
-export const fetchNowLive = async (): Promise<LiveMember[]> => {
-  let res = await fetch(NOW_LIVE_API, {
-    headers: {
-      Accept: "application/json",
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
-  });
-  if (!res.ok) {
-    res = await fetch(NOW_LIVE_FALLBACK, { headers: { Accept: "application/json" } });
-  }
-  if (!res.ok) throw new Error("Gagal memuat data live");
-  const data = await res.json();
+const parseLives = (data: any): LiveMember[] => {
   const list: LiveMember[] = Array.isArray(data) ? data : data?.data || data?.now_live || [];
   return list.filter((l) => !!l && !!l.url_key);
+};
+
+export const fetchNowLive = async (): Promise<LiveMember[]> => {
+  try {
+    const res = await fetch(NOW_LIVE_API, {
+      headers: {
+        Accept: "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+    });
+    if (res.ok) {
+      const list = parseLives(await res.json());
+      if (list.length > 0) return list;
+    }
+  } catch {
+    // lanjut ke sumber langsung
+  }
+
+  const direct = await fetch(NOW_LIVE_FALLBACK, { headers: { Accept: "application/json" } });
+  if (!direct.ok) throw new Error("Gagal memuat data live");
+  return parseLives(await direct.json());
 };
 
 export const formatElapsed = (startedAt: string, nowMs: number): string => {
