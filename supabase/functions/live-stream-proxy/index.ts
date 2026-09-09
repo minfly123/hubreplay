@@ -74,13 +74,43 @@ Deno.serve(async (req) => {
 
   const requestUrl = new URL(req.url);
   if (requestUrl.searchParams.get("action") === "lives") {
-    try {
-      const upstream = await fetch(LIVE_API, { headers: upstreamHeaders });
-      if (!upstream.ok) throw new Error("Live API unavailable");
-      return jsonResponse(await upstream.json());
-    } catch {
-      return jsonResponse({ error: "Gagal memuat data live" }, 502);
+    const attempts: Array<{ url: string; headers: Record<string, string> }> = [
+      { url: LIVE_API, headers: upstreamHeaders },
+      { url: LIVE_API, headers: { Accept: "application/json" } },
+      { url: "https://api.crstlnz.my.id/api/now_live", headers: upstreamHeaders },
+    ];
+
+    let lastError = "";
+    for (const attempt of attempts) {
+      try {
+        const upstream = await fetch(attempt.url, {
+          headers: attempt.headers,
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!upstream.ok) {
+          lastError = `status ${upstream.status}`;
+          continue;
+        }
+        const text = await upstream.text();
+        let data: unknown;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          lastError = "invalid json";
+          continue;
+        }
+        const list = Array.isArray(data)
+          ? data
+          : (data as any)?.data || (data as any)?.now_live || [];
+        return jsonResponse(list);
+      } catch (e) {
+        lastError = e instanceof Error ? e.message : "fetch failed";
+      }
     }
+
+    console.error("now_live upstream failed:", lastError);
+    // Jangan bikin UI blank: balas list kosong dengan status 200.
+    return jsonResponse([]);
   }
 
   const rawUrl = requestUrl.searchParams.get("url");
