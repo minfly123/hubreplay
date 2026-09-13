@@ -14,6 +14,10 @@ const ALLOWED_STREAM_HOSTS = [
   ".idnpay.com",
   ".idnstatic.com",
   ".crstlnz.my.id",
+  ".idn.app",
+  ".idnvideos.com",
+  ".ivs.rocks",
+
 ];
 const responseHeaders = {
   ...corsHeaders,
@@ -120,18 +124,48 @@ Deno.serve(async (req) => {
 
   try {
     const sourceUrl = new URL(rawUrl).toString();
+    const host = new URL(sourceUrl).hostname;
     const isManifest = new URL(sourceUrl).pathname.endsWith(".m3u8");
-    const headers = new Headers({ Accept: isManifest ? "application/vnd.apple.mpegurl, */*" : "*/*" });
+    const accept = isManifest ? "application/vnd.apple.mpegurl, */*" : "*/*";
     const range = req.headers.get("range");
-    if (range) headers.set("Range", range);
 
-    let upstream = await fetch(sourceUrl, { headers });
-    if (!upstream.ok && isManifest) {
-      upstream = await fetch(`${STREAM_API}${encodeURIComponent(sourceUrl)}`, {
-        headers: { ...upstreamHeaders, Accept: "application/vnd.apple.mpegurl, */*" },
+    // Beberapa provider (IDN via AWS IVS, Showroom) menolak permintaan tanpa Origin/Referer.
+    const referers = host.includes("live-video.net")
+      ? ["https://www.idn.app/", "https://idn.app/", ""]
+      : host.includes("showroom")
+        ? ["https://www.showroom-live.com/", ""]
+        : ["", "https://dc.crstlnz.my.id/"];
+
+    let upstream: Response | null = null;
+    for (const referer of referers) {
+      const headers = new Headers({
+        Accept: accept,
+        "User-Agent": upstreamHeaders["User-Agent"],
       });
+      if (referer) {
+        headers.set("Referer", referer);
+        headers.set("Origin", new URL(referer).origin);
+      }
+      if (range) headers.set("Range", range);
+
+      const attempt = await fetch(sourceUrl, { headers, redirect: "follow" });
+      if (attempt.ok) {
+        upstream = attempt;
+        break;
+      }
+      await attempt.body?.cancel();
     }
-    if (!upstream.ok) return jsonResponse({ error: "Stream is temporarily unavailable" }, upstream.status);
+
+    if (!upstream && isManifest) {
+      const relay = await fetch(`${STREAM_API}${encodeURIComponent(sourceUrl)}`, {
+        headers: { ...upstreamHeaders, Accept: accept },
+      });
+      if (relay.ok) upstream = relay;
+      else await relay.body?.cancel();
+    }
+
+    if (!upstream) return jsonResponse({ error: "Stream is temporarily unavailable" }, 502);
+
 
     if (isManifest) {
       const manifest = await upstream.text();
