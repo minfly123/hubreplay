@@ -14,6 +14,10 @@ const ALLOWED_STREAM_HOSTS = [
   ".idnpay.com",
   ".idnstatic.com",
   ".crstlnz.my.id",
+  ".idn.app",
+  ".idnvideos.com",
+  ".ivs.rocks",
+
 ];
 const responseHeaders = {
   ...corsHeaders,
