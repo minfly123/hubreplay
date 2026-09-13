@@ -17,11 +17,10 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let done = false;
+    let active = true;
 
     const finish = (ok: boolean) => {
-      if (done) return;
-      done = true;
+      if (!active) return;
       setStatus(ok ? "ready" : "invalid");
     };
 
@@ -30,60 +29,55 @@ const ResetPassword = () => {
     };
 
     const run = async () => {
-      // 1) Sudah ada sesi recovery aktif?
-      const { data: existing } = await supabase.auth.getSession();
-      if (existing.session) {
-        finish(true);
-        return;
-      }
-
       const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
       const query = new URLSearchParams(window.location.search);
 
-      // 2) Link gaya implicit: #access_token=...&refresh_token=...
-      const access_token = hash.get("access_token");
-      const refresh_token = hash.get("refresh_token");
-      if (access_token && refresh_token) {
-        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-        clearUrl();
-        finish(!error);
-        return;
-      }
-
-      // 3) Link gaya PKCE: ?code=...
-      const code = query.get("code");
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        clearUrl();
-        finish(!error);
-        return;
-      }
-
-      // 4) Link gaya verify: ?token_hash=...&type=recovery (atau di hash)
-      const token_hash = query.get("token_hash") || hash.get("token_hash");
-      if (token_hash) {
-        const { error } = await supabase.auth.verifyOtp({ token_hash, type: "recovery" });
-        clearUrl();
-        finish(!error);
-        return;
-      }
-
-      // 5) Error dari email link
       if (hash.get("error_description") || query.get("error_description")) {
         finish(false);
         return;
       }
 
-      finish(false);
+      const access_token = hash.get("access_token");
+      const refresh_token = hash.get("refresh_token");
+      if (access_token && refresh_token) {
+        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+        if (!error) clearUrl();
+        finish(!error);
+        return;
+      }
+
+      const code = query.get("code");
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) clearUrl();
+        finish(!error);
+        return;
+      }
+
+      const token_hash = query.get("token_hash") || hash.get("token_hash");
+      if (token_hash) {
+        const { error } = await supabase.auth.verifyOtp({ token_hash, type: "recovery" });
+        if (!error) clearUrl();
+        finish(!error);
+        return;
+      }
+
+      const { data: existing } = await supabase.auth.getSession();
+      finish(Boolean(existing.session));
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) finish(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || session) {
+        finish(true);
+      }
     });
 
     run();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

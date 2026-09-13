@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Play, Mail, Lock } from "lucide-react";
 
+const PASSWORD_RESET_URL = "https://arcanove48.my.id/reset-password";
+
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -55,7 +57,7 @@ const Auth = () => {
     }
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: PASSWORD_RESET_URL,
     });
     setLoading(false);
     if (error) {
