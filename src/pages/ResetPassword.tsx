@@ -67,7 +67,7 @@ const ResetPassword = () => {
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (session && status === "checking")) {
+      if (event === "PASSWORD_RECOVERY" || session) {
         finish(true);
       }
     });
@@ -78,7 +78,7 @@ const ResetPassword = () => {
       active = false;
       subscription.unsubscribe();
     };
-  }, [status]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
