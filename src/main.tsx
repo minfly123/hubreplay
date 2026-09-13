@@ -2,6 +2,27 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+const ARCANOVE_ORIGIN = "https://arcanove48.my.id";
+
+const recoveryParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+const isRecoveryLink =
+  recoveryParams.get("type") === "recovery" ||
+  (recoveryParams.has("access_token") && recoveryParams.has("refresh_token"));
+
+if (isRecoveryLink && window.location.hostname === "hubreplay.lovable.app") {
+  window.location.replace(
+    `${ARCANOVE_ORIGIN}/reset-password${window.location.search}${window.location.hash}`,
+  );
+}
+
+if (isRecoveryLink && window.location.pathname !== "/reset-password") {
+  window.history.replaceState(
+    null,
+    "",
+    `/reset-password${window.location.search}${window.location.hash}`,
+  );
+}
+
 // Restore deep link after GitHub Pages 404 fallback
 if (typeof window !== "undefined") {
   const redirect = sessionStorage.getItem("spa-redirect");
@@ -29,4 +50,10 @@ if (typeof window !== "undefined") {
   });
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const root = document.getElementById("root");
+
+if (root && window.location.hostname !== "hubreplay.lovable.app") {
+  createRoot(root).render(<App />);
+} else if (root && !isRecoveryLink) {
+  createRoot(root).render(<App />);
+}
