@@ -33,6 +33,9 @@ const LiveStream = () => {
   const [err, setErr] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const [qualityIdx, setQualityIdx] = useState(0);
+  // Sumber IDN (AWS IVS) hanya bisa diakses dari Indonesia, jadi diputar langsung
+  // dari browser penonton. Proxy dipakai sebagai cadangan bila akses langsung gagal.
+  const [useProxy, setUseProxy] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -72,10 +75,11 @@ const LiveStream = () => {
 
   const streams = streamUrls(live);
   const stream = streams[qualityIdx] || streams[0];
-  const playbackUrl = stream?.url ? proxiedStreamUrl(stream.url) : null;
+  const playbackUrl = stream?.url ? (useProxy ? proxiedStreamUrl(stream.url) : stream.url) : null;
 
   useEffect(() => {
     setQualityIdx(0);
+    setUseProxy(false);
   }, [urlKey, type]);
 
   useEffect(() => {
@@ -116,6 +120,11 @@ const LiveStream = () => {
         if (!data.fatal) return;
 
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          if (!useProxy) {
+            setErr("Mencoba jalur alternatif…");
+            setUseProxy(true);
+            return;
+          }
           setErr("Koneksi stream terputus. Mencoba menyambungkan kembali…");
           window.setTimeout(() => hls?.startLoad(), 1000);
           return;
