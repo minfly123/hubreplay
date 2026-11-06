@@ -211,8 +211,8 @@ const Home = () => {
       <div className="container mx-auto px-4 pb-8">
         <div className="glass-card p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">🤝 Bekerjasama dengan</span>
-            <span className="text-sm font-bold text-gradient">This Is Ucil Streaming Live</span>
+            <span className="text-xs text-muted-foreground">🤝 Partner web resmi</span>
+            <span className="text-sm font-bold text-gradient">by Everything JKT48</span>
           </div>
         </div>
       </div>

@@ -2,11 +2,11 @@
 
 ## Core
 - "Arcanove48": WEBSITE RESMI Komunitas Arcanove48 (fans JKT48), AI bernama Arva AI. Jangan sebut "platform arsip independen/non-official".
-- Partner resmi: "This Is Ucil Streaming Live" (penyedia replay) — credit harus muncul di Home.
+- Partner web resmi: by Everything JKT48 — credit harus muncul di Home.
 - Dark theme with red and pink accents (JKT48 visual identity).
 - Backend: Supabase (realtime DB, email auto-confirm). Login hanya email & password — Google login dihapus.
 - Home = Live Member (`/`), replay show di `/replay`. Login hanya email & password.
-- Display persistent watermark "Create by Dimzzvloper" bottom right on all pages.
+- Display persistent watermark "Arcanove48 © 2026" bottom right on all pages.
 - Fitur Gift, undian, dan koin SUDAH DIHAPUS — jangan re-add.
 
 - Website resmi Komunitas Arcanove48; halaman "Tentang Web" (/about) dihapus. Login/daftar tidak wajib — tombol Login/Daftar di header.
